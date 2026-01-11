@@ -6,8 +6,8 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #111;
-      color: #eee;
+      background: #121212;
+      color: #f0f0f0;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -42,7 +42,7 @@
       SessionKit,
       WalletPluginCloudWallet,
       WalletPluginAnchor
-    } from "https://cdn.jsdelivr.net/npm/@wharfkit/session@1.0.0/dist/session.min.js";
+    } from "https://cdn.jsdelivr.net/npm/@wharfkit/session";
 
     // WAX mainnet chain info
     const chain = {
@@ -69,17 +69,17 @@
         const session = await sessionKit.login();
 
         document.getElementById("status").innerText =
-          "Logged in as: " + session.actor.toString();
+          "✅ Logged in as: " + session.actor.toString();
 
         console.log("Session:", session);
       } catch (err) {
-        console.error(err);
+        console.error("Login error:", err);
         document.getElementById("status").innerText =
-          "Login failed or cancelled";
+          "❌ Login failed or cancelled";
       }
     }
 
-    // Expose login() to the window
+    // Expose login globally for button onclick
     window.login = login;
   </script>
 </body>
