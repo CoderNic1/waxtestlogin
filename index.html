@@ -1,0 +1,3082 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SECRET CODE TERMINAL - CLASSIFIED ACCESS</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap');
+        
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary-green: #00ff41;
+            --danger-red: #ff0040;
+            --warning-orange: #ff9500;
+            --bg-dark: #0a0e14;
+            --bg-darker: #050810;
+            --classic: #4a90e2;
+            --common: #7ed321;
+            --uncommon: #50e3c2;
+            --rare: #bd10e0;
+            --epic: #ff6b35;
+            --legendary: #ffd700;
+        }
+        
+        body {
+            font-family: 'Share Tech Mono', monospace;
+            background: var(--bg-darker);
+            color: var(--primary-green);
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+        }
+        
+        /* Matrix Background */
+        #matrix-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.15;
+            pointer-events: none;
+        }
+        
+        /* Scanline Effect */
+        .scanline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                transparent 50%,
+                rgba(0, 255, 65, 0.02) 50%
+            );
+            background-size: 100% 4px;
+            z-index: 1;
+            pointer-events: none;
+            animation: scanline 8s linear infinite;
+        }
+        
+        @keyframes scanline {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(4px); }
+        }
+        
+        /* Glitch Effect */
+        .glitch-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            z-index: 2;
+            pointer-events: none;
+            opacity: 0;
+        }
+        
+        .glitch-overlay.active {
+            animation: glitch 0.3s infinite;
+            opacity: 1;
+        }
+        
+        @keyframes glitch {
+            0%, 100% { 
+                transform: translate(0);
+                filter: hue-rotate(0deg);
+            }
+            33% { 
+                transform: translate(-2px, 2px);
+                filter: hue-rotate(90deg);
+            }
+            66% { 
+                transform: translate(2px, -2px);
+                filter: hue-rotate(180deg);
+            }
+        }
+        
+        /* Corruption Overlay */
+        .corruption-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, transparent 40%, rgba(255, 0, 64, 0.1) 100%);
+            z-index: 2;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 1s;
+        }
+        
+        .corruption-overlay.active {
+            opacity: 1;
+        }
+        
+        /* Main Container */
+        .container {
+            position: relative;
+            z-index: 3;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* Header */
+        .terminal-header {
+            text-align: center;
+            padding: 30px 20px;
+            border-bottom: 2px solid var(--primary-green);
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .terminal-header h1 {
+            font-family: 'Orbitron', monospace;
+            font-size: 2.5em;
+            font-weight: 900;
+            letter-spacing: 4px;
+            text-shadow: 0 0 20px var(--primary-green);
+            animation: flicker 3s infinite;
+        }
+        
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.95; }
+            51% { opacity: 1; }
+        }
+        
+        .terminal-header .subtitle {
+            color: var(--warning-orange);
+            margin-top: 10px;
+            font-size: 0.9em;
+            letter-spacing: 2px;
+        }
+        
+        /* System Status */
+        .system-status {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(10, 14, 20, 0.8);
+            border: 1px solid var(--primary-green);
+            border-radius: 5px;
+        }
+        
+        .status-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .status-label {
+            font-size: 0.8em;
+            color: var(--warning-orange);
+        }
+        
+        .status-value {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        
+        /* Navigation */
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .nav-tab {
+            padding: 12px 24px;
+            background: rgba(10, 14, 20, 0.8);
+            border: 1px solid var(--primary-green);
+            color: var(--primary-green);
+            cursor: pointer;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.9em;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .nav-tab:hover {
+            background: var(--primary-green);
+            color: var(--bg-dark);
+            box-shadow: 0 0 20px var(--primary-green);
+        }
+        
+        .nav-tab.active {
+            background: var(--primary-green);
+            color: var(--bg-dark);
+        }
+        
+        /* Sections */
+        .section {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Code Entry */
+        .code-entry {
+            background: rgba(10, 14, 20, 0.9);
+            border: 2px solid var(--primary-green);
+            border-radius: 5px;
+            padding: 40px;
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .code-entry h2 {
+            font-family: 'Orbitron', monospace;
+            margin-bottom: 20px;
+            color: var(--warning-orange);
+        }
+        
+        .code-input {
+            width: 100%;
+            padding: 15px;
+            background: var(--bg-darker);
+            border: 2px solid var(--primary-green);
+            color: var(--primary-green);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.2em;
+            text-align: center;
+            letter-spacing: 3px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        
+        .code-input:focus {
+            outline: none;
+            box-shadow: 0 0 20px var(--primary-green);
+        }
+        
+        .submit-btn {
+            padding: 15px 40px;
+            background: var(--primary-green);
+            color: var(--bg-dark);
+            border: none;
+            font-family: 'Orbitron', monospace;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .submit-btn:hover {
+            box-shadow: 0 0 30px var(--primary-green);
+            transform: scale(1.05);
+        }
+        
+        .submit-btn:disabled {
+            background: #333;
+            color: #666;
+            cursor: not-allowed;
+            box-shadow: none;
+            opacity: 0.5;
+        }
+        
+        /* Lockout Screen */
+        .lockout-screen {
+            display: none;
+            background: rgba(10, 14, 20, 0.95);
+            border: 3px solid var(--danger-red);
+            border-radius: 5px;
+            padding: 60px 40px;
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+            animation: pulse 2s infinite;
+        }
+        
+        .lockout-screen.active {
+            display: block;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 20px var(--danger-red); }
+            50% { box-shadow: 0 0 40px var(--danger-red); }
+        }
+        
+        .lockout-screen h2 {
+            color: var(--danger-red);
+            font-family: 'Orbitron', monospace;
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+        
+        .countdown-timer {
+            font-size: 3em;
+            color: var(--danger-red);
+            font-family: 'Orbitron', monospace;
+            margin: 30px 0;
+            text-shadow: 0 0 20px var(--danger-red);
+        }
+        
+        /* Success Screen */
+        .success-screen {
+            display: none;
+            background: rgba(10, 14, 20, 0.95);
+            border: 3px solid var(--primary-green);
+            border-radius: 5px;
+            padding: 40px;
+            max-width: 700px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        
+        .success-screen.active {
+            display: block;
+            animation: successReveal 1s;
+        }
+        
+        @keyframes successReveal {
+            0% { opacity: 0; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        
+        .rarity-badge {
+            display: inline-block;
+            padding: 10px 30px;
+            border-radius: 5px;
+            font-family: 'Orbitron', monospace;
+            font-weight: bold;
+            margin: 20px 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .rarity-classic { background: var(--classic); color: white; }
+        .rarity-common { background: var(--common); color: white; }
+        .rarity-uncommon { background: var(--uncommon); color: white; }
+        .rarity-rare { background: var(--rare); color: white; }
+        .rarity-epic { background: var(--epic); color: white; }
+        .rarity-legendary { 
+            background: linear-gradient(45deg, var(--legendary), #ff6b35);
+            color: var(--bg-dark);
+            animation: legendary-glow 2s infinite;
+        }
+        
+        @keyframes legendary-glow {
+            0%, 100% { box-shadow: 0 0 30px var(--legendary); }
+            50% { box-shadow: 0 0 60px var(--legendary); }
+        }
+        
+        .mission-title {
+            font-size: 2em;
+            font-family: 'Orbitron', monospace;
+            margin: 20px 0;
+        }
+        
+        .mission-description {
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin: 20px 0;
+        }
+        
+        .reward-btn {
+            display: inline-block;
+            padding: 15px 40px;
+            background: var(--warning-orange);
+            color: white;
+            text-decoration: none;
+            font-family: 'Orbitron', monospace;
+            font-weight: bold;
+            margin-top: 20px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        
+        .reward-btn:hover {
+            box-shadow: 0 0 30px var(--warning-orange);
+            transform: scale(1.05);
+        }
+        
+        .continue-btn {
+            margin-top: 20px;
+            padding: 12px 30px;
+            background: var(--primary-green);
+            color: var(--bg-dark);
+            border: none;
+            font-family: 'Orbitron', monospace;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        /* Log Book */
+        .log-book {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .log-entry {
+            background: rgba(10, 14, 20, 0.8);
+            border: 1px solid var(--primary-green);
+            border-radius: 5px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+        
+        .log-header {
+            padding: 15px 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s;
+        }
+        
+        .log-header:hover {
+            background: rgba(0, 255, 65, 0.1);
+        }
+        
+        .log-details {
+            display: none;
+            padding: 20px;
+            border-top: 1px solid var(--primary-green);
+        }
+        
+        .log-details.expanded {
+            display: block;
+        }
+        
+        /* Side Missions */
+        .missions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .mission-card {
+            background: rgba(10, 14, 20, 0.8);
+            border: 2px solid var(--primary-green);
+            border-radius: 5px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+        
+        .mission-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0, 255, 65, 0.3);
+        }
+        
+        .mission-card.locked {
+            opacity: 0.5;
+            border-color: #333;
+        }
+        
+        .mission-card.completed {
+            border-color: var(--warning-orange);
+        }
+        
+        .mission-reward {
+            color: var(--warning-orange);
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        
+        /* Network Map */
+        .network-map {
+            background: rgba(10, 14, 20, 0.8);
+            border: 2px solid var(--primary-green);
+            border-radius: 5px;
+            padding: 40px;
+            min-height: 500px;
+            position: relative;
+        }
+        
+        .node {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid #333;
+            background: var(--bg-darker);
+            transition: all 0.5s;
+            cursor: pointer;
+        }
+        
+        .node.active {
+            box-shadow: 0 0 20px currentColor;
+            animation: nodeGlow 2s infinite;
+        }
+        
+        @keyframes nodeGlow {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .node-connection {
+            position: absolute;
+            height: 2px;
+            background: #333;
+            transform-origin: left center;
+            transition: background 0.5s;
+        }
+        
+        .node-connection.active {
+            background: var(--primary-green);
+            box-shadow: 0 0 10px var(--primary-green);
+        }
+        
+        /* Encrypted Clues */
+        .clue-container {
+            background: rgba(10, 14, 20, 0.9);
+            border: 2px solid var(--warning-orange);
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .clue-text {
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--warning-orange);
+            text-align: center;
+            font-size: 1.1em;
+            letter-spacing: 2px;
+            animation: scramble 0.5s;
+        }
+        
+        @keyframes scramble {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        /* Threat Warning */
+        .threat-warning {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: var(--danger-red);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-family: 'Orbitron', monospace;
+            font-weight: bold;
+            z-index: 1000;
+            display: none;
+            animation: warningBlink 1s infinite;
+        }
+        
+        .threat-warning.active {
+            display: block;
+        }
+        
+        @keyframes warningBlink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        /* Footer */
+        footer {
+            margin-top: 60px;
+            padding: 30px 20px;
+            text-align: center;
+            border-top: 2px solid var(--primary-green);
+            background: rgba(10, 14, 20, 0.8);
+        }
+        
+        footer a {
+            color: var(--warning-orange);
+            text-decoration: none;
+            margin: 0 10px;
+            transition: all 0.3s;
+        }
+        
+        footer a:hover {
+            color: var(--primary-green);
+            text-shadow: 0 0 10px var(--primary-green);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .terminal-header h1 {
+                font-size: 1.8em;
+            }
+            
+            .code-entry, .lockout-screen, .success-screen {
+                padding: 20px;
+            }
+            
+            .missions-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Cooldown Indicator */
+        .cooldown-indicator {
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(255, 149, 0, 0.2);
+            border: 1px solid var(--warning-orange);
+            border-radius: 5px;
+            font-size: 0.9em;
+        }
+        /* Warning Box */
+.warning-box {
+    background: rgba(255, 149, 0, 0.1);
+    border: 2px solid var(--warning-orange);
+    border-radius: 5px;
+    padding: 20px;
+    margin: 20px auto;
+    max-width: 800px;
+    text-align: center;
+}
+
+.warning-box h3 {
+    color: var(--warning-orange);
+    font-family: 'Orbitron', monospace;
+    margin-bottom: 10px;
+    font-size: 1.2em;
+}
+
+.warning-box p {
+    color: var(--primary-green);
+    line-height: 1.6;
+}
+        /* Discord Unlock Modal */
+.discord-unlock-modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2000;
+    background: rgba(10, 14, 20, 0.98);
+    border: 3px solid var(--legendary);
+    border-radius: 10px;
+    padding: 40px;
+    max-width: 600px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 0 50px var(--legendary);
+    animation: discordReveal 1s;
+}
+
+.discord-unlock-modal.active {
+    display: block;
+}
+
+@keyframes discordReveal {
+    0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+    50% { transform: translate(-50%, -50%) scale(1.1); }
+    100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+.discord-unlock-modal h2 {
+    color: var(--legendary);
+    font-family: 'Orbitron', monospace;
+    font-size: 2em;
+    margin-bottom: 20px;
+    text-shadow: 0 0 20px var(--legendary);
+}
+
+.discord-btn {
+    display: inline-block;
+    padding: 15px 40px;
+    background: #5865F2;
+    color: white;
+    text-decoration: none;
+    font-family: 'Orbitron', monospace;
+    font-weight: bold;
+    margin-top: 20px;
+    border-radius: 5px;
+    transition: all 0.3s;
+    font-size: 1.1em;
+}
+
+.discord-btn:hover {
+    box-shadow: 0 0 30px #5865F2;
+    transform: scale(1.05);
+}
+
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 1999;
+}
+
+.modal-overlay.active {
+    display: block;
+}
+
+/* Mission Brief Modal */
+.mission-brief-modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2000;
+    background: rgba(10, 14, 20, 0.98);
+    border: 3px solid var(--primary-green);
+    border-radius: 10px;
+    padding: 40px;
+    max-width: 700px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 0 50px var(--primary-green);
+}
+
+.mission-brief-modal.active {
+    display: block;
+    animation: fadeIn 0.3s;
+}
+
+.mission-brief-modal h2 {
+    color: var(--primary-green);
+    font-family: 'Orbitron', monospace;
+    font-size: 1.8em;
+    margin-bottom: 20px;
+    text-align: center;
+    text-shadow: 0 0 10px var(--primary-green);
+}
+
+.mission-brief-modal p {
+    line-height: 1.8;
+    margin-bottom: 15px;
+    font-size: 1em;
+}
+
+.mission-brief-modal .close-modal-btn {
+    display: block;
+    margin: 30px auto 0;
+    padding: 12px 30px;
+    background: var(--primary-green);
+    color: var(--bg-dark);
+    border: none;
+    font-family: 'Orbitron', monospace;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: all 0.3s;
+}
+
+.mission-brief-modal .close-modal-btn:hover {
+    box-shadow: 0 0 20px var(--primary-green);
+    transform: scale(1.05);
+}
+
+/* Settings Modal */
+.settings-modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2000;
+    background: rgba(10, 14, 20, 0.98);
+    border: 3px solid var(--primary-green);
+    border-radius: 10px;
+    padding: 40px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 0 50px var(--primary-green);
+}
+
+.settings-modal.active {
+    display: block;
+    animation: fadeIn 0.3s;
+}
+
+.settings-modal h2 {
+    color: var(--primary-green);
+    font-family: 'Orbitron', monospace;
+    font-size: 1.8em;
+    margin-bottom: 20px;
+    text-align: center;
+    text-shadow: 0 0 10px var(--primary-green);
+}
+
+.settings-section {
+    margin: 30px 0;
+    padding: 20px;
+    background: rgba(10, 14, 20, 0.5);
+    border: 1px solid var(--primary-green);
+    border-radius: 5px;
+}
+
+.settings-section h3 {
+    color: var(--warning-orange);
+    font-family: 'Orbitron', monospace;
+    margin-bottom: 15px;
+    font-size: 1.2em;
+}
+
+.settings-section p {
+    color: var(--primary-green);
+    line-height: 1.6;
+    margin-bottom: 15px;
+    font-size: 0.9em;
+}
+
+.clear-data-btn {
+    padding: 12px 30px;
+    background: var(--danger-red);
+    color: white;
+    border: none;
+    font-family: 'Orbitron', monospace;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: all 0.3s;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.clear-data-btn:hover:not(:disabled) {
+    box-shadow: 0 0 20px var(--danger-red);
+    transform: scale(1.02);
+}
+
+.clear-data-btn:disabled {
+    background: #333;
+    color: #666;
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.reset-cooldown-info {
+    margin-top: 15px;
+    padding: 15px;
+    background: rgba(255, 149, 0, 0.1);
+    border: 1px solid var(--warning-orange);
+    border-radius: 5px;
+    color: var(--warning-orange);
+    font-size: 0.9em;
+    text-align: center;
+}
+
+/* Settings Modal Close Button */
+.settings-modal .close-modal-btn {
+    display: block;
+    margin: 30px auto 0;
+    padding: 12px 30px;
+    background: var(--primary-green);
+    color: var(--bg-dark);
+    border: none;
+    font-family: 'Orbitron', monospace;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: all 0.3s;
+}
+
+.settings-modal .close-modal-btn:hover {
+    box-shadow: 0 0 20px var(--primary-green);
+    transform: scale(1.05);
+}
+
+/* Agent Name Modal */
+.agent-name-modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2001;
+    background: rgba(10, 14, 20, 0.98);
+    border: 3px solid var(--primary-green);
+    border-radius: 10px;
+    padding: 40px;
+    max-width: 600px;
+    width: 90%;
+    box-shadow: 0 0 50px var(--primary-green);
+    animation: fadeIn 0.3s;
+}
+
+.agent-name-modal.active {
+    display: block;
+}
+
+.agent-name-modal h2 {
+    color: var(--primary-green);
+    font-family: 'Orbitron', monospace;
+    font-size: 1.8em;
+    margin-bottom: 20px;
+    text-align: center;
+    text-shadow: 0 0 10px var(--primary-green);
+}
+
+.agent-name-input {
+    width: 100%;
+    padding: 15px;
+    background: var(--bg-darker);
+    border: 2px solid var(--primary-green);
+    color: var(--primary-green);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 1.1em;
+    text-align: center;
+    letter-spacing: 2px;
+    margin: 20px 0;
+    text-transform: uppercase;
+}
+
+.agent-name-input:focus {
+    outline: none;
+    box-shadow: 0 0 20px var(--primary-green);
+}
+
+.agent-name-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 25px;
+}
+
+.agent-name-btn {
+    padding: 12px 30px;
+    background: var(--primary-green);
+    color: var(--bg-dark);
+    border: none;
+    font-family: 'Orbitron', monospace;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: all 0.3s;
+}
+
+.agent-name-btn:hover {
+    box-shadow: 0 0 20px var(--primary-green);
+    transform: scale(1.05);
+}
+
+.agent-name-btn.secondary {
+    background: rgba(10, 14, 20, 0.8);
+    color: var(--primary-green);
+    border: 2px solid var(--primary-green);
+}
+
+.agent-name-btn.secondary:hover {
+    background: var(--primary-green);
+    color: var(--bg-dark);
+}
+
+/* Agent Name in Settings */
+.agent-name-section {
+    margin: 30px 0;
+    padding: 20px;
+    background: rgba(10, 14, 20, 0.5);
+    border: 1px solid var(--primary-green);
+    border-radius: 5px;
+}
+
+.agent-name-section h3 {
+    color: var(--warning-orange);
+    font-family: 'Orbitron', monospace;
+    margin-bottom: 15px;
+    font-size: 1.2em;
+}
+
+.agent-name-display {
+    color: var(--primary-green);
+    font-size: 1.2em;
+    font-weight: bold;
+    margin: 15px 0;
+    padding: 10px;
+    background: rgba(0, 255, 65, 0.1);
+    border: 1px solid var(--primary-green);
+    border-radius: 5px;
+    text-align: center;
+}
+
+.agent-name-edit-input {
+    width: 100%;
+    padding: 12px;
+    background: var(--bg-darker);
+    border: 2px solid var(--primary-green);
+    color: var(--primary-green);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 1em;
+    text-align: center;
+    letter-spacing: 1px;
+    margin: 10px 0;
+    text-transform: uppercase;
+}
+
+.agent-name-edit-input:focus {
+    outline: none;
+    box-shadow: 0 0 15px var(--primary-green);
+}
+
+.agent-name-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.agent-name-action-btn {
+    padding: 10px 20px;
+    background: var(--primary-green);
+    color: var(--bg-dark);
+    border: none;
+    font-family: 'Orbitron', monospace;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: all 0.3s;
+    flex: 1;
+}
+
+.agent-name-action-btn:hover {
+    box-shadow: 0 0 15px var(--primary-green);
+    transform: scale(1.02);
+}
+
+.agent-name-action-btn.danger {
+    background: var(--danger-red);
+    color: white;
+}
+
+.agent-name-action-btn.danger:hover {
+    box-shadow: 0 0 15px var(--danger-red);
+}
+
+/* Mission Modal */
+.mission-modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2000;
+    background: rgba(10, 14, 20, 0.98);
+    border: 3px solid var(--primary-green);
+    border-radius: 10px;
+    padding: 40px;
+    max-width: 700px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 0 50px var(--primary-green);
+}
+
+.mission-modal.active {
+    display: block;
+    animation: fadeIn 0.3s;
+}
+
+.mission-modal h2 {
+    color: var(--primary-green);
+    font-family: 'Orbitron', monospace;
+    font-size: 1.8em;
+    margin-bottom: 20px;
+    text-align: center;
+    text-shadow: 0 0 10px var(--primary-green);
+}
+
+.mission-puzzle-display {
+    background: rgba(10, 14, 20, 0.8);
+    border: 2px solid var(--warning-orange);
+    border-radius: 5px;
+    padding: 30px;
+    margin: 20px 0;
+    text-align: center;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 1.5em;
+    color: var(--warning-orange);
+    letter-spacing: 3px;
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mission-input {
+    width: 100%;
+    padding: 15px;
+    background: var(--bg-darker);
+    border: 2px solid var(--primary-green);
+    color: var(--primary-green);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 1.2em;
+    text-align: center;
+    letter-spacing: 2px;
+    margin: 20px 0;
+    text-transform: uppercase;
+}
+
+.mission-input:focus {
+    outline: none;
+    box-shadow: 0 0 20px var(--primary-green);
+}
+
+.mission-timer {
+    text-align: center;
+    font-size: 2em;
+    color: var(--warning-orange);
+    font-family: 'Orbitron', monospace;
+    margin: 20px 0;
+    text-shadow: 0 0 20px var(--warning-orange);
+}
+
+.mission-instructions {
+    color: var(--primary-green);
+    text-align: center;
+    line-height: 1.6;
+    margin: 20px 0;
+}
+
+.mission-feedback {
+    padding: 15px;
+    border-radius: 5px;
+    margin: 20px 0;
+    text-align: center;
+    font-family: 'Orbitron', monospace;
+    font-weight: bold;
+    display: none;
+}
+
+.mission-feedback.success {
+    background: rgba(126, 211, 33, 0.2);
+    border: 2px solid var(--common);
+    color: var(--common);
+    display: block;
+}
+
+.mission-feedback.error {
+    background: rgba(255, 0, 64, 0.2);
+    border: 2px solid var(--danger-red);
+    color: var(--danger-red);
+    display: block;
+}
+
+.mission-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 25px;
+}
+
+.mission-btn {
+    padding: 12px 30px;
+    background: var(--primary-green);
+    color: var(--bg-dark);
+    border: none;
+    font-family: 'Orbitron', monospace;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: all 0.3s;
+}
+
+.mission-btn:hover {
+    box-shadow: 0 0 20px var(--primary-green);
+    transform: scale(1.05);
+}
+
+.mission-btn:disabled {
+    background: #333;
+    color: #666;
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.mission-btn.secondary {
+    background: rgba(10, 14, 20, 0.8);
+    color: var(--primary-green);
+    border: 2px solid var(--primary-green);
+}
+
+.mission-btn.secondary:hover {
+    background: var(--primary-green);
+    color: var(--bg-dark);
+}
+
+.memory-sequence {
+    font-size: 3em;
+    letter-spacing: 10px;
+    font-weight: bold;
+}
+
+.memory-countdown {
+    font-size: 4em;
+    color: var(--danger-red);
+    animation: pulse 1s infinite;
+}
+
+.code-input:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.hidden {
+    display: none !important;
+}
+.alert-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.95);
+    border: 3px solid #eab308;
+    padding: 40px;
+    z-index: 1001;
+    text-align: center;
+    box-shadow: 0 0 50px #eab308;
+    max-width: 600px;
+    width: 90%;
+    display: none;
+}
+
+.alert-popup.active {
+    display: block;
+}
+
+.alert-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    display: none;
+}
+
+.alert-overlay.active {
+    display: block;
+}
+    </style>
+</head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<body>
+    <canvas id="matrix-canvas"></canvas>
+    <div class="scanline"></div>
+    <div class="glitch-overlay"></div>
+    <div class="corruption-overlay"></div>
+    <div class="threat-warning">⚠ SYSTEM THREAT DETECTED ⚠</div>
+  
+    
+     <!-- Alert Popup (for messages) -->
+     <div id="alert-overlay" class="alert-overlay"></div>
+     <div id="alert-popup" class="alert-popup">
+         <h2 id="alert-title" style="color: #eab308; text-shadow: 0 0 10px #eab308; margin-bottom: 15px;">⚠ SYSTEM ALERT</h2>
+         <p id="alert-message" style="color: #fbbf24; margin-bottom: 20px; line-height: 1.6;"></p>
+         <button id="close-alert-btn" class="submit-btn">ACKNOWLEDGE</button>
+     </div>
+
+    <div class="container">
+        <header class="terminal-header">
+            <h1>◈ SECRET CODE TERMINAL ◈</h1>
+            <p class="subtitle">CLASSIFIED ACCESS PROTOCOL ENGAGED</p>
+        </header>
+        
+        <div class="system-status">
+            <div class="status-item">
+                <span class="status-label">CODES REDEEMED</span>
+                <span class="status-value" id="codes-redeemed">0</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">SYSTEM INTEGRITY</span>
+                <span class="status-value" id="system-integrity">50%</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">MISSIONS COMPLETED</span>
+                <span class="status-value" id="missions-completed">0</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">NETWORK NODES</span>
+                <span class="status-value" id="network-nodes">0/20</span>
+            </div>
+        </div>
+        
+        <nav class="nav-tabs">
+            <button class="nav-tab active" data-section="terminal">TERMINAL</button>
+            <button class="nav-tab" data-section="logbook">LOG BOOK</button>
+            <button class="nav-tab" data-section="missions">SIDE MISSIONS</button>
+            <button class="nav-tab" data-section="network">NETWORK MAP</button>
+            <button class="nav-tab" data-section="clues">ENCRYPTED CLUES</button>
+        </nav>
+        
+        <!-- Warning Box -->
+        <div class="warning-box">
+            <h3>⚠ AGENT PROTOCOL NOTICE ⚠</h3>
+            <p>Each code contains a <strong>ONE-TIME USE</strong> reward link. Only the first agent to successfully decrypt and claim a code will have access to the reward. Once claimed, the code remains valid for mission progress, but the reward link will be permanently deactivated. Act fast, <span id="warning-agent-name">operative</span>.</p>
+        </div>
+
+        <!-- Terminal Section -->
+        <section class="section active" id="terminal-section">
+            <div class="code-entry" id="code-entry-form">
+                <h2>ENTER ACCESS CODE</h2>
+                <p style="margin-bottom: 20px; color: var(--warning-orange);">Classification Level: RESTRICTED</p>
+                <input type="text" class="code-input" id="code-input" placeholder="_ _ _ _ _ _ _ _" maxlength="50">
+                <br>
+                <button class="submit-btn" id="submit-code">DECRYPT & ACCESS</button>
+                <div class="cooldown-indicator" id="cooldown-indicator" style="display: none;">
+                    Next code entry available in: <span id="cooldown-time">0:00</span>
+                </div>
+            </div>
+            
+            <div class="lockout-screen" id="lockout-screen">
+                <h2>⚠ ACCESS DENIED ⚠</h2>
+                <p>INVALID CODE DETECTED</p>
+                <p>SYSTEM LOCKOUT INITIATED</p>
+                <div class="countdown-timer" id="countdown-timer">5:00</div>
+                <p>Security protocols engaged. Tampering detected will result in extended lockout.</p>
+            </div>
+            
+            <div class="success-screen" id="success-screen">
+                <h2>✓ CODE VALIDATED ✓</h2>
+                <div class="rarity-badge" id="rarity-badge">COMMON</div>
+                <div class="mission-title" id="mission-title">Mission Title</div>
+                <div class="mission-description" id="mission-description">Mission description goes here...</div>
+                <a href="#" class="reward-btn" id="reward-link" target="_blank">CLAIM REWARD</a>
+                <br>
+                <button class="continue-btn" id="continue-btn">CONTINUE</button>
+            </div>
+        </section>
+        
+        <!-- Log Book Section -->
+        <section class="section" id="logbook-section">
+            <div class="log-book">
+                <h2 style="text-align: center; margin-bottom: 30px; font-family: 'Orbitron', monospace;">CLASSIFIED ARCHIVE</h2>
+                <div id="log-entries"></div>
+                <p id="no-logs" style="text-align: center; color: #666;">No codes redeemed yet. Begin your mission in the terminal.</p>
+            </div>
+        </section>
+        
+        <!-- Side Missions Section -->
+        <section class="section" id="missions-section">
+            <h2 style="text-align: center; margin-bottom: 30px; font-family: 'Orbitron', monospace;">INTELLIGENCE OPERATIONS</h2>
+            <div class="missions-grid" id="missions-grid"></div>
+        </section>
+        
+        <!-- Network Map Section -->
+        <section class="section" id="network-section">
+            <h2 style="text-align: center; margin-bottom: 30px; font-family: 'Orbitron', monospace;">NETWORK INFILTRATION MAP</h2>
+            <div class="network-map" id="network-map"></div>
+        </section>
+        
+        <!-- Encrypted Clues Section -->
+        <section class="section" id="clues-section">
+            <h2 style="text-align: center; margin-bottom: 30px; font-family: 'Orbitron', monospace;">INTERCEPTED TRANSMISSIONS</h2>
+            <div id="clues-container"></div>
+            <p id="no-clues" style="text-align: center; color: #666; margin-top: 20px;">No transmissions intercepted. Continue your mission to unlock encrypted data.</p>
+        </section>
+
+        <!-- Discord Unlock Modal -->
+<div class="modal-overlay" id="discord-overlay"></div>
+<div class="discord-unlock-modal" id="discord-modal">
+    <h2>🎊 NETWORK INFILTRATION COMPLETE 🎊</h2>
+    <p style="font-size: 1.2em; margin: 20px 0; color: var(--primary-green);">
+        You have successfully mapped the entire network!
+    </p>
+    <p style="margin: 20px 0;">
+        Access granted to the SECRET OPERATIVE DISCORD SERVER.<br>
+        Join your fellow agents and coordinate future operations.
+    </p>
+    <a href="YOUR_DISCORD_INVITE_LINK" class="discord-btn" target="_blank">
+        JOIN DISCORD SERVER
+    </a>
+    <br>
+    <button class="continue-btn" onclick="closeDiscordModal()">CONTINUE</button>
+</div>
+
+
+<!-- Mission Brief Modal -->
+<div class="modal-overlay" id="brief-overlay"></div>
+<div class="mission-brief-modal" id="mission-brief-modal">
+    <h2>◈ CLASSIFIED BRIEFING ◈</h2>
+    <p><strong>PRIORITY: CRITICAL</strong></p>
+    <p>Your mission: Locate and decrypt hidden codes scattered across the network. Each successful decryption brings us closer to uncovering the truth behind the <strong>SECRET MISSION</strong>.</p>
+    <p>Intelligence indicates that these codes have been distributed across multiple channels - both digital and physical. Only the most skilled operatives will be able to track them down.</p>
+    <p><strong>REWARD STRUCTURE:</strong></p>
+    <p>Each code unlocks exclusive rewards hosted on the WAXP blockchain network. These are <span style="color: var(--danger-red);">ONE-TIME USE</span> links - only the first agent to claim will receive the reward.</p>
+    <p><strong>MISSION OBJECTIVES:</strong></p>
+    <p>• Decrypt secret codes and claim rewards<br>
+    • Complete side missions to reduce cooldowns<br>
+    • Map the entire network (20 nodes)<br>
+    • Unlock access to the secret operative Discord server</p>
+    <p style="margin-top: 20px; color: var(--warning-orange);"><strong>Remember, <span id="brief-agent-name">operative</span>: Speed and precision are essential. The network is watching.</strong></p>
+    <button class="close-modal-btn" onclick="closeMissionBrief()">ACKNOWLEDGED</button>
+</div>
+
+<!-- Agent Name Prompt Modal (First Time) -->
+<div class="modal-overlay" id="agent-name-overlay"></div>
+<div class="agent-name-modal" id="agent-name-modal">
+    <h2>◈ AGENT IDENTIFICATION ◈</h2>
+    <p style="color: var(--primary-green); text-align: center; line-height: 1.6;">
+        Welcome to the SECRET CODE TERMINAL, operative.<br><br>
+        For mission personalization, you may choose an <strong>AGENT NAME</strong> or continue as <strong>ANONYMOUS</strong>.<br><br>
+        <span style="color: var(--warning-orange); font-size: 0.9em;">Note: Your agent name is stored locally and used only for UI personalization. All database operations remain anonymous for GDPR compliance.</span>
+    </p>
+    <input type="text" class="agent-name-input" id="agent-name-input" placeholder="ENTER AGENT NAME (OPTIONAL)" maxlength="30">
+    <div class="agent-name-buttons">
+        <button class="agent-name-btn" onclick="saveAgentName()">CONFIRM</button>
+        <button class="agent-name-btn secondary" onclick="continueAnonymous()">CONTINUE ANONYMOUS</button>
+    </div>
+</div>
+
+<!-- Mission Modal -->
+<div class="modal-overlay" id="mission-overlay"></div>
+<div class="mission-modal" id="mission-modal">
+    <h2 id="mission-modal-title">◈ MISSION BRIEFING ◈</h2>
+    <div class="mission-instructions" id="mission-instructions"></div>
+    <div class="mission-puzzle-display" id="mission-puzzle-display"></div>
+    <div class="mission-timer" id="mission-timer" style="display: none;"></div>
+    <input type="text" class="mission-input" id="mission-input" placeholder="ENTER YOUR ANSWER" style="display: none;">
+    <div class="mission-feedback" id="mission-feedback"></div>
+    <div class="mission-buttons">
+        <button class="mission-btn" id="mission-submit-btn" onclick="submitMissionAnswer()" style="display: none;">SUBMIT</button>
+        <button class="mission-btn secondary" id="mission-cancel-btn" onclick="closeMissionModal()">CANCEL</button>
+        <button class="mission-btn" id="mission-start-btn" onclick="startMissionUI()" style="display: none;">START</button>
+    </div>
+</div>
+
+<!-- Settings Modal -->
+<div class="modal-overlay" id="settings-overlay"></div>
+<div class="settings-modal" id="settings-modal">
+    <h2>⚙️ SYSTEM SETTINGS ⚙️</h2>
+    
+    <div class="agent-name-section">
+        <h3>👤 AGENT IDENTITY</h3>
+        <p style="color: var(--primary-green); font-size: 0.9em; margin-bottom: 10px;">Your agent name is used for UI personalization only. Database operations remain anonymous.</p>
+        <div id="agent-name-display-container">
+            <div class="agent-name-display" id="current-agent-name">ANONYMOUS</div>
+            <button class="agent-name-action-btn" onclick="editAgentName()">EDIT AGENT NAME</button>
+        </div>
+        <div id="agent-name-edit-container" style="display: none;">
+            <input type="text" class="agent-name-edit-input" id="agent-name-edit-input" placeholder="ENTER NEW AGENT NAME" maxlength="30">
+            <div class="agent-name-actions">
+                <button class="agent-name-action-btn" onclick="saveEditedAgentName()">SAVE</button>
+                <button class="agent-name-action-btn secondary" onclick="cancelEditAgentName()">CANCEL</button>
+                <button class="agent-name-action-btn danger" onclick="removeAgentName()">REMOVE</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="settings-section">
+        <h3>🗑️ DATA MANAGEMENT</h3>
+        <p>Clear all locally stored data including:</p>
+        <ul style="color: var(--primary-green); margin-left: 20px; margin-bottom: 15px;">
+            <li>Redeemed codes history</li>
+            <li>Mission progress</li>
+            <li>Network map nodes</li>
+            <li>Cached reward data</li>
+            <li>System integrity status</li>
+        </ul>
+        <p style="color: var(--warning-orange); font-size: 0.85em;"><strong>⚠️ WARNING:</strong> This action cannot be undone. All local progress will be permanently deleted.</p>
+        <button class="clear-data-btn" id="clear-data-btn" onclick="handleClearData()">CLEAR ALL DATA</button>
+        <div id="reset-cooldown-info" class="reset-cooldown-info" style="display: none;"></div>
+    </div>
+    
+    <button class="close-modal-btn" onclick="closeSettings()">CLOSE</button>
+</div>
+     </div>
+ 
+
+    <footer>
+        <p style="margin-bottom: 15px;">POWERED BY THE WAXP BLOCKCHAIN NETWORK</p>
+        <p style="color: #666; font-size: 0.9em; margin-bottom: 10px;">This classified operation utilizes decentralized infrastructure for secure mission coordination.</p>
+        <div>
+            <a href="https://wax.io" target="_blank">WAX PROTOCOL</a> | 
+            <a href="https://www.atomichub.io" target="_blank">ATOMIC HUB</a> | 
+            <a href="#" id="mission-brief">SECRET MISSION BRIEF</a> | 
+            <a href="#" id="settings-link">SETTINGS</a>
+        </div>
+        <p style="margin-top: 15px; font-size: 0.8em; color: #666;">UNAUTHORIZED ACCESS IS PROHIBITED</p>
+    </footer>
+
+    <script type="module">
+  import { getFirestore, doc, getDoc, runTransaction } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBy9UcDcoLOx8DvwX5LVecCN5moRvFjcpU",
+    authDomain: "secretwax-4dbf0.firebaseapp.com",
+    databaseURL: "https://secretwax-4dbf0-default-rtdb.firebaseio.com",
+    projectId: "secretwax-4dbf0",
+    storageBucket: "secretwax-4dbf0.firebasestorage.app",
+    messagingSenderId: "19692324028",
+    appId: "1:19692324028:web:06aa3ea5d2e368fb257cb9"
+  };
+
+  // Initialize Firebase.
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const auth = getAuth(app);
+
+  signInAnonymously(auth)
+    .then(() => console.log("Signed in anonymously"))
+    .catch((error) => console.error("Auth error:", error));
+
+// State Management
+let gameState = {
+    redeemedCodes: [],
+    lockoutEnd: null,
+    cooldownEnd: null,
+    completedMissions: [],
+    networkNodes: [],
+    systemIntegrity: 50,
+    failedAttempts: 0,
+    lastActivity: Date.now(),
+    encryptedClues: [],
+    worldState: 'unstable',
+    discordUnlocked: false,
+    logbookCache: {},  // Cache for reward data: { code: { data, timestamp } }
+    lastCacheRefresh: null,  // Timestamp of last full cache refresh
+    firstFailedAttemptTime: null,  // Timestamp of first failed attempt in current window
+    failedAttemptsInWindow: 0  // Number of failed attempts within 1-hour window
+};
+
+// Cache configuration
+const CACHE_DURATION = 3600000; // 1 hour in milliseconds
+
+
+// Load state from localStorage
+function loadState() {
+    const saved = localStorage.getItem('secretTerminalState');
+    if (saved) {
+        gameState = { ...gameState, ...JSON.parse(saved) };
+    }
+    // Ensure cache properties exist (for backward compatibility)
+    if (!gameState.logbookCache) {
+        gameState.logbookCache = {};
+    }
+    if (!gameState.lastCacheRefresh) {
+        gameState.lastCacheRefresh = null;
+    }
+    if (gameState.firstFailedAttemptTime === undefined) {
+        gameState.firstFailedAttemptTime = null;
+    }
+    if (gameState.failedAttemptsInWindow === undefined) {
+        gameState.failedAttemptsInWindow = 0;
+    }
+}
+
+// Save state to localStorage
+function saveState() {
+    localStorage.setItem('secretTerminalState', JSON.stringify(gameState));
+}
+
+// Initialize
+loadState();
+
+// Calculate lockout time with escalating penalties
+function calculateLockoutTime() {
+    const now = Date.now();
+    const ONE_HOUR_MS = 3600000; // 1 hour in milliseconds
+    const ESCALATION_MS = 300000; // 5 minutes per failed attempt
+    const BASE_LOCKOUT_MS = 300000; // 5 minutes base
+    const MIN_LOCKOUT_MS = 120000; // 2 minutes minimum
+    
+    // Mission reduction (30 seconds per mission)
+    const reduction = gameState.completedMissions.length * 30000;
+    // Calculate base lockout time (reduced by completed missions)
+    const baseLockout = Math.max(MIN_LOCKOUT_MS, BASE_LOCKOUT_MS - reduction);
+    
+    // Check if we're still within the 1-hour window
+    if (gameState.firstFailedAttemptTime && (now - gameState.firstFailedAttemptTime) < ONE_HOUR_MS) {
+        // Still within window - increment counter and calculate escalated time
+        gameState.failedAttemptsInWindow++;
+        // Escalation: base + (attempts - 1) * 5 minutes
+        const escalatedLockout = BASE_LOCKOUT_MS + ((gameState.failedAttemptsInWindow - 1) * ESCALATION_MS);
+        
+        // The lower wait time should always apply (as user requested)
+        // This means if base (after mission reduction) is lower, use base instead of escalated
+        return Math.min(baseLockout, escalatedLockout);
+    } else {
+        // Window expired or doesn't exist - reset and start fresh with base time
+        gameState.firstFailedAttemptTime = now;
+        gameState.failedAttemptsInWindow = 1;
+        return baseLockout;
+    }
+}
+
+function resetFailedAttemptWindow() {
+    gameState.firstFailedAttemptTime = null;
+    gameState.failedAttemptsInWindow = 0;
+}
+
+function showAlert(title, message) {
+    document.getElementById('alert-title').textContent = title;
+    document.getElementById('alert-message').textContent = message;
+    document.getElementById('alert-overlay').classList.add('active');
+    document.getElementById('alert-popup').classList.add('active');
+}
+
+function closeAlert() {
+    document.getElementById('alert-overlay').classList.remove('active');
+    document.getElementById('alert-popup').classList.remove('active');
+}
+
+// Matrix Background
+const canvas = document.getElementById('matrix-canvas');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+const matrix = '01';
+const fontSize = 14;
+let columns = canvas.width / fontSize;
+let drops = Array(Math.floor(columns)).fill(1);
+
+function drawMatrix() {
+    ctx.fillStyle = 'rgba(5, 8, 16, 0.05)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    ctx.fillStyle = '#00ff41';
+    ctx.font = fontSize + 'px monospace';
+    
+    for (let i = 0; i < drops.length; i++) {
+        const text = matrix[Math.floor(Math.random() * matrix.length)];
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+        
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+            drops[i] = 0;
+        }
+        drops[i]++;
+    }
+}
+
+setInterval(drawMatrix, 50);
+
+window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    // Recalculate columns and drops array for new canvas size
+    columns = canvas.width / fontSize;
+    const newDropsLength = Math.floor(columns);
+    if (newDropsLength !== drops.length) {
+        drops = Array(newDropsLength).fill(1);
+    }
+});
+
+// Navigation
+document.querySelectorAll('.nav-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        
+        tab.classList.add('active');
+        const section = tab.dataset.section;
+        document.getElementById(`${section}-section`).classList.add('active');
+    });
+});
+
+// Update Status Display
+function updateStatus() {
+    document.getElementById('codes-redeemed').textContent = gameState.redeemedCodes.length;
+    document.getElementById('system-integrity').textContent = Math.round(gameState.systemIntegrity) + '%';
+    document.getElementById('missions-completed').textContent = gameState.completedMissions.length;
+    document.getElementById('network-nodes').textContent = gameState.networkNodes.length + '/20';
+    
+    // Update world state visuals
+    if (gameState.systemIntegrity > 80) {
+        document.querySelector('.corruption-overlay').classList.remove('active');
+        canvas.style.opacity = '0.3';
+    } else if (gameState.systemIntegrity < 30) {
+        document.querySelector('.corruption-overlay').classList.add('active');
+        canvas.style.opacity = '0.1';
+    }
+}
+
+// Check Lockout
+function checkLockout() {
+    if (gameState.lockoutEnd && Date.now() < gameState.lockoutEnd) {
+        showLockout();
+        return true;
+    }
+    return false;
+}
+
+// Check Cooldown
+function checkCooldown() {
+    if (gameState.cooldownEnd && Date.now() < gameState.cooldownEnd) {
+        return true;
+    }
+    return false;
+}
+
+// Show Lockout
+function showLockout() {
+    document.getElementById('code-entry-form').style.display = 'none';
+    document.getElementById('lockout-screen').classList.add('active');
+    document.getElementById('success-screen').classList.remove('active');
+    
+    // Trigger glitch
+    document.querySelector('.glitch-overlay').classList.add('active');
+    setTimeout(() => {
+        document.querySelector('.glitch-overlay').classList.remove('active');
+    }, 1000);
+    
+    updateCountdown();
+}
+
+// Update Countdown
+function updateCountdown() {
+    const interval = setInterval(() => {
+        if (!gameState.lockoutEnd || Date.now() >= gameState.lockoutEnd) {
+            clearInterval(interval);
+            document.getElementById('lockout-screen').classList.remove('active');
+            document.getElementById('code-entry-form').style.display = 'block';
+            gameState.lockoutEnd = null;
+            saveState();
+            return;
+        }
+        
+        const remaining = gameState.lockoutEnd - Date.now();
+        const minutes = Math.floor(remaining / 60000);
+        const seconds = Math.floor((remaining % 60000) / 1000);
+        document.getElementById('countdown-timer').textContent = 
+            `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    }, 1000);
+}
+
+// Update Cooldown Display
+function updateCooldownDisplay() {
+    const cooldownIndicator = document.getElementById('cooldown-indicator');
+    const cooldownTime = document.getElementById('cooldown-time');
+    const submitBtn = document.getElementById('submit-code');
+    const codeInput = document.getElementById('code-input');
+    
+    if (checkCooldown()) {
+        cooldownIndicator.style.display = 'block';
+        submitBtn.disabled = true;
+        submitBtn.style.opacity = '0.5';
+        submitBtn.style.cursor = 'not-allowed';
+        codeInput.disabled = true;
+        codeInput.style.opacity = '0.6';
+        
+        const interval = setInterval(() => {
+            if (!gameState.cooldownEnd || Date.now() >= gameState.cooldownEnd) {
+                clearInterval(interval);
+                cooldownIndicator.style.display = 'none';
+                submitBtn.disabled = false;
+                submitBtn.style.opacity = '1';
+                submitBtn.style.cursor = 'pointer';
+                codeInput.disabled = false;
+                codeInput.style.opacity = '1';
+                gameState.cooldownEnd = null;
+                saveState();
+                return;
+            }
+            
+            const remaining = gameState.cooldownEnd - Date.now();
+            const minutes = Math.floor(remaining / 60000);
+            const seconds = Math.floor((remaining % 60000) / 1000);
+            cooldownTime.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }, 1000);
+    } else {
+        cooldownIndicator.style.display = 'none';
+        submitBtn.disabled = false;
+        submitBtn.style.opacity = '1';
+        submitBtn.style.cursor = 'pointer';
+        codeInput.disabled = false;
+        codeInput.style.opacity = '1';
+    }
+}
+
+// Firebase Functions
+async function getRewardFromFirestore(code) {
+    try {
+        const ref = doc(db, "rewards", code);
+        const snap = await getDoc(ref);
+
+        if (!snap.exists()) {
+            return null;
+        }
+
+        return { id: code, ...snap.data() };
+    } catch (error) {
+        console.error("Error fetching reward:", error);
+        showAlert("⚠ NETWORK ERROR", "Unable to establish secure connection. Please check your connection and try again.");
+        return null;
+    }
+}
+
+async function claimRewardInFirestore(code) {
+  try {
+    const ref = doc(db, "rewards", code);
+
+    return await runTransaction(db, async (transaction) => {
+      const snap = await transaction.get(ref);
+
+      if (!snap.exists()) {
+        showAlert("❌ UNKNOWN CODE", "This code does not exist.");
+        return { success: false, reason: "not_found" };
+      }
+
+      const data = snap.data();
+      const now = Date.now();
+
+      // Unique claim check
+      if (data.UniqueClaim === true && data.claimed === true) {
+        showAlert("⚠ ALREADY CLAIMED", "This reward has already been claimed.");
+        return { success: false, reason: "already_claimed" };
+      }
+
+      // ValidFrom check
+      if (data.ValidFrom && now < data.ValidFrom) {
+        showAlert("⏳ TOO EARLY", "This reward is not available yet.");
+        return { success: false, reason: "too_early" };
+      }
+
+      // ValidTill check
+      if (data.ValidTill && now > data.ValidTill) {
+        showAlert("⌛ EXPIRED", "This reward is no longer valid.");
+        return { success: false, reason: "expired" };
+      }
+
+      // Write logic
+      if (data.UniqueClaim === true) {
+        // Unique reward → mark as claimed
+        transaction.update(ref, {
+          claimed: true,
+          claimedBy: "anonymous Agent",
+          claimedAt: now
+        });
+      } else {
+        // Non-unique reward → allow infinite claims
+        transaction.update(ref, {
+          claimedBy: "anonymous Agent",
+          claimedAt: now
+        });
+      }
+
+      showAlert("🎉 SUCCESS", "Reward successfully claimed.");
+      return { success: true };
+    });
+
+  } catch (error) {
+    console.error("Error claiming reward:", error);
+    showAlert("⚠ ERROR", "Something went wrong. Please try again or contact the website owner.");
+    return { success: false, reason: "error", error: error.message };
+  }
+}
+
+// Cache Management Functions
+function getCachedRewardData(code) {
+    const cached = gameState.logbookCache[code];
+    if (cached && (Date.now() - cached.timestamp) < CACHE_DURATION) {
+        return cached.data; // Return cached data if still valid
+    }
+    return null; // Cache expired or doesn't exist
+}
+
+function setCachedRewardData(code, data) {
+    // SECURITY: Don't cache gift links for unique claims (one-time use)
+    // This prevents links from being stored in localStorage
+    const safeData = { ...data };
+    
+    if (data.UniqueClaim === true) {
+        // Remove the link from cache for unique claims
+        delete safeData.link;
+        // Mark that link needs to be fetched fresh
+        safeData._linkNeedsFetch = true;
+    }
+    
+    gameState.logbookCache[code] = {
+        data: safeData,
+        timestamp: Date.now()
+    };
+    saveState(); // Persist cache
+}
+
+// Fetch gift link on-demand (for unique claims that weren't cached)
+async function getRewardLink(code) {
+    try {
+        const ref = doc(db, "rewards", code);
+        const snap = await getDoc(ref);
+        
+        if (!snap.exists()) {
+            return null;
+        }
+        
+        const data = snap.data();
+        return data.link || null;
+    } catch (error) {
+        console.error("Error fetching reward link:", error);
+        return null;
+    }
+}
+
+async function refreshLogbookCache(forceRefresh = false) {
+    const now = Date.now();
+    const needsRefresh = !gameState.lastCacheRefresh || 
+                        (now - gameState.lastCacheRefresh) >= CACHE_DURATION ||
+                        forceRefresh;
+    
+    if (!needsRefresh) {
+        return; // Use existing cache
+    }
+    
+    // Fetch only codes that need refresh
+    const codesToFetch = [];
+    for (const code of gameState.redeemedCodes) {
+        const cached = gameState.logbookCache[code];
+        if (!cached || (now - cached.timestamp) >= CACHE_DURATION) {
+            codesToFetch.push(code);
+        }
+    }
+    
+    // Fetch codes that need refresh
+    for (const code of codesToFetch) {
+        try {
+            const data = await getRewardFromFirestore(code);
+            if (data) {
+                setCachedRewardData(code, data);
+            }
+        } catch (error) {
+            console.error(`Error refreshing cache for code ${code}:`, error);
+        }
+    }
+    
+    gameState.lastCacheRefresh = now;
+    saveState();
+}
+
+// Submit Code (FIXED: Made async and fixed error handling)
+document.getElementById('submit-code').addEventListener('click', async () => {
+    if (checkLockout()) return;
+    if (checkCooldown()) {
+        showAlert('⚠ DONT GO SO FAST', 'Please wait for cooldown period to end.');
+        return;
+    }
+    
+    const code = document.getElementById('code-input').value.trim().toUpperCase();
+    
+    if (!code) {
+        showAlert('⚠ INVALID FORMAT', 'Please enter a valid code.');
+        return;
+    }
+    
+    // Disable button during processing
+    const submitBtn = document.getElementById('submit-code');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'PROCESSING...';
+    
+    try {
+        const match = await getRewardFromFirestore(code);
+        
+        if (match) {
+            // Check if already redeemed locally
+            if (gameState.redeemedCodes.includes(code)) {
+                const agentName = getAgentName();
+                const name = agentName ? `, ${agentName.toUpperCase()}` : '';
+                showAlert('⚠ CODE ALREADY REDEEMED', `This code has already been processed by your terminal${name}. Check your Log Book for details.`);
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'DECRYPT & ACCESS';
+                return;
+            }
+
+                // Try to claim in Firestore
+            const claimResult = await claimRewardInFirestore(code);
+
+            // Check if claim failed due to timing issues (too early or expired)
+            if (!claimResult.success && (claimResult.reason === "too_early" || claimResult.reason === "expired")) {
+                // Treat as failed attempt - trigger lockout
+                gameState.failedAttempts++;
+                gameState.systemIntegrity = Math.max(0, gameState.systemIntegrity - 5);
+                
+                // Calculate lockout time with escalating penalties
+                const lockoutMs = calculateLockoutTime();
+                
+                gameState.lockoutEnd = Date.now() + lockoutMs;
+                
+                saveState();
+                updateStatus();
+                showLockout();
+                
+                // Check for threat events
+                if (gameState.failedAttempts >= 3) {
+                    triggerThreatEvent();
+                }
+                return;
+            }
+
+            // Even if already claimed, we still count it for progress
+            if (claimResult.reason === "already_claimed") {
+                 // Don't show error, just mark as claimed in the match data
+                    match.claimed = true;
+                    match.claimedBy = "Another Agent";
+                    match.claimedAt = Date.now(); // Approximate
+                }
+
+            // Only proceed if claim was successful or already claimed
+            if (!claimResult.success && claimResult.reason !== "already_claimed") {
+                // Unknown error - treat as failed attempt
+                gameState.failedAttempts++;
+                gameState.systemIntegrity = Math.max(0, gameState.systemIntegrity - 5);
+                
+                // Calculate lockout time with escalating penalties
+                const lockoutMs = calculateLockoutTime();
+                
+                gameState.lockoutEnd = Date.now() + lockoutMs;
+                
+                saveState();
+                updateStatus();
+                showLockout();
+                
+                // Check for threat events
+                if (gameState.failedAttempts >= 3) {
+                    triggerThreatEvent();
+                }
+                return;
+            }
+
+                // Cache the data immediately (link removed for unique claims)
+                setCachedRewardData(code, match);
+
+                // Success! (whether newly claimed or already claimed)
+                gameState.redeemedCodes.push(code);
+                gameState.systemIntegrity = Math.min(100, gameState.systemIntegrity + 10);
+                gameState.failedAttempts = 0;
+                resetFailedAttemptWindow(); // Reset escalation window on successful code
+
+                // Set cooldown (1 hour)
+                const cooldownMs = Math.max(600000, 3600000 - (gameState.completedMissions.length * 600000));
+                gameState.cooldownEnd = Date.now() + cooldownMs;
+
+                // Add network node
+                gameState.networkNodes.push({ code, rarity: match.rarity });
+
+                // Check for Discord unlock
+                checkDiscordUnlock();
+
+                // Show success screen (pass code for link fetching if needed)
+                await showSuccess(match, code);
+
+                // Generate new clue
+                generateClue();
+
+                saveState();
+                updateStatus();
+                updateCooldownDisplay();
+                updateLogBook();
+                updateNetworkMap();
+
+        } else {
+            // Failed attempt
+            gameState.failedAttempts++;
+            gameState.systemIntegrity = Math.max(0, gameState.systemIntegrity - 5);
+            
+            // Calculate lockout time with escalating penalties
+            const lockoutMs = calculateLockoutTime();
+            
+            gameState.lockoutEnd = Date.now() + lockoutMs;
+            
+            saveState();
+            updateStatus();
+            showLockout();
+            
+            // Check for threat events
+            if (gameState.failedAttempts >= 3) {
+                triggerThreatEvent();
+            }
+        }
+    } catch (error) {
+        console.error("Error processing code:", error);
+        showAlert('⚠ CONNECTION ERROR', 'Unable to establish secure connection. Please retry your operation.');
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'DECRYPT & ACCESS';
+        document.getElementById('code-input').value = '';
+    }
+});
+
+// Show Success
+async function showSuccess(data, code) {
+    document.getElementById('code-entry-form').style.display = 'none';
+    document.getElementById('lockout-screen').classList.remove('active');
+    document.getElementById('success-screen').classList.add('active');
+    
+    const rarityBadge = document.getElementById('rarity-badge');
+    rarityBadge.textContent = data.rarity.toUpperCase();
+    rarityBadge.className = 'rarity-badge rarity-' + data.rarity;
+    
+    document.getElementById('mission-title').textContent = data.title;
+    
+    // Build description with additional info
+    let descriptionHTML = `<p>${data.description}</p>`;
+    
+    // Add collection info if exists
+    if (data.collection) {
+        descriptionHTML += `<p style="margin-top: 15px; color: var(--warning-orange);"><strong>Collection:</strong> ${data.collection}</p>`;
+    }
+    
+    // Add sponsored badge if true
+    if (data.sponsored) {
+        descriptionHTML += `<p style="margin-top: 10px;"><span style="background: var(--warning-orange); color: white; padding: 5px 15px; border-radius: 3px; font-weight: bold;">🎁 SPONSORED REWARD</span></p>`;
+    }
+    
+    // Add claimed status
+    if (data.claimed) {
+        descriptionHTML += `<p style="margin-top: 15px; padding: 15px; background: rgba(255, 0, 64, 0.2); border: 2px solid var(--danger-red); border-radius: 5px;">
+            <strong style="color: var(--danger-red);">⚠ REWARD ALREADY CLAIMED ⚠</strong><br>
+            <span style="font-size: 0.9em;">Claimed on: ${new Date(data.claimedAt).toLocaleString()}</span><br>
+            <span style="font-size: 0.9em;">Agent: ${data.claimedBy}</span>
+        </p>`;
+    }
+    
+    document.getElementById('mission-description').innerHTML = descriptionHTML;
+    
+    // Show/hide reward button based on claimed status
+    const rewardBtn = document.getElementById('reward-link');
+    if (data.claimed) {
+        rewardBtn.style.display = 'none';
+    } else {
+        // SECURITY: For unique claims, link might not be in data (removed from cache)
+        // Fetch link on-demand if needed
+        let linkToUse = data.link;
+        
+        if (data.UniqueClaim === true && (!linkToUse || data._linkNeedsFetch)) {
+            // Link was not cached for security - fetch it now
+            const fetchedLink = await getRewardLink(code || data.id);
+            if (fetchedLink) {
+                linkToUse = fetchedLink;
+            }
+        }
+        
+        if (linkToUse) {
+            rewardBtn.style.display = 'inline-block';
+            rewardBtn.href = linkToUse;
+        } else {
+            rewardBtn.style.display = 'none';
+        }
+    }
+    
+    // Rarity effects
+    if (data.rarity === 'legendary' || data.rarity === 'epic') {
+        document.querySelector('.glitch-overlay').classList.add('active');
+        setTimeout(() => {
+            document.querySelector('.glitch-overlay').classList.remove('active');
+        }, 2000);
+    }
+    
+    updateMissions();
+}
+
+// Continue Button
+document.getElementById('continue-btn').addEventListener('click', () => {
+    document.getElementById('success-screen').classList.remove('active');
+    document.getElementById('code-entry-form').style.display = 'block';
+});
+
+// Update Log Book (OPTIMIZED: Uses cache to reduce database calls)
+async function updateLogBook(forceRefresh = false) {
+    const container = document.getElementById('log-entries');
+    const noLogs = document.getElementById('no-logs');
+    
+    if (gameState.redeemedCodes.length === 0) {
+        noLogs.style.display = 'block';
+        container.innerHTML = '';
+        return;
+    }
+    
+    noLogs.style.display = 'none';
+    
+    // Show cached data immediately (if available)
+    const cachedEntries = [];
+    for (const code of gameState.redeemedCodes) {
+        const cached = getCachedRewardData(code);
+        if (cached) {
+            cachedEntries.push({ code, data: cached });
+        }
+    }
+    
+    if (cachedEntries.length > 0) {
+        await renderLogEntries(cachedEntries);
+    } else {
+        container.innerHTML = '<p style="text-align: center; color: var(--warning-orange);">Loading archive...</p>';
+    }
+    
+    // Refresh cache in background (only if needed)
+    await refreshLogbookCache(forceRefresh);
+    
+    // Re-render with fresh data
+    const freshEntries = [];
+    for (const code of gameState.redeemedCodes) {
+        const data = getCachedRewardData(code);
+        if (data) {
+            freshEntries.push({ code, data });
+        }
+    }
+    
+    if (freshEntries.length > 0) {
+        await renderLogEntries(freshEntries);
+    }
+}
+
+// Render log entries (extracted for reuse)
+async function renderLogEntries(entries) {
+    const container = document.getElementById('log-entries');
+    container.innerHTML = '';
+    
+    for (const { code, data } of entries) {
+        const entry = document.createElement('div');
+        entry.className = 'log-entry';
+        
+        // Build additional info
+        let additionalInfo = '';
+        if (data.collection) {
+            additionalInfo += `<p><strong>Collection:</strong> ${data.collection}</p>`;
+        }
+        if (data.sponsored) {
+            additionalInfo += `<p><span style="background: var(--warning-orange); color: white; padding: 3px 10px; border-radius: 3px; font-size: 0.85em;">SPONSORED</span></p>`;
+        }
+        
+        // Claimed status
+        let claimedStatus = '';
+        let rewardLink = '';
+        
+        if (data.claimed) {
+            claimedStatus = `<p style="color: var(--danger-red); margin-top: 10px;"><strong>⚠ Already Claimed</strong><br><span style="font-size: 0.85em;">By: ${data.claimedBy} | ${new Date(data.claimedAt).toLocaleString()}</span></p>`;
+        } else {
+            // SECURITY: For unique claims, fetch link on-demand (not from cache)
+            let linkToUse = data.link;
+            
+            if (data.UniqueClaim === true && data._linkNeedsFetch) {
+                // Link was not cached for security - fetch it now
+                linkToUse = await getRewardLink(code);
+            }
+            
+            if (linkToUse) {
+                rewardLink = `<a href="${linkToUse}" target="_blank" class="reward-btn" style="display: inline-block; margin-top: 10px; padding: 10px 20px; font-size: 0.9em;">ACCESS REWARD</a>`;
+            } else {
+                rewardLink = `<p style="color: var(--warning-orange); margin-top: 10px; font-size: 0.9em;">⚠ Link unavailable - may have been claimed</p>`;
+            }
+        }
+        
+        entry.innerHTML = `
+            <div class="log-header">
+                <div>
+                    <strong>${data.title}</strong>
+                    <span class="rarity-badge rarity-${data.rarity}" style="margin-left: 10px; padding: 5px 15px; font-size: 0.8em;">${data.rarity.toUpperCase()}</span>
+                    ${data.claimed ? '<span style="margin-left: 10px; color: var(--danger-red); font-size: 0.8em;">● CLAIMED</span>' : '<span style="margin-left: 10px; color: var(--primary-green); font-size: 0.8em;">● AVAILABLE</span>'}
+                </div>
+                <span>▼</span>
+            </div>
+            <div class="log-details">
+                <p><strong>Code:</strong> ${code}</p>
+                <p><strong>Description:</strong> ${data.description}</p>
+                ${additionalInfo}
+                ${claimedStatus}
+                ${rewardLink}
+            </div>
+        `;
+        
+        entry.querySelector('.log-header').addEventListener('click', () => {
+            entry.querySelector('.log-details').classList.toggle('expanded');
+        });
+        
+        container.appendChild(entry);
+    }
+}
+
+// Side Missions
+const sideMissions = [
+    {
+        id: 'decrypt1',
+        title: 'Cipher Breaker',
+        description: 'Decrypt the scrambled phrase',
+        requirement: 1,
+        reward: 'Reduce lockout by 30s',
+        type: 'cipher',
+        puzzle: 'EODC SI EILF',
+        answer: 'CODE IS LIFE'
+    },
+    {
+        id: 'pattern1',
+        title: 'Pattern Recognition',
+        description: 'Identify the sequence pattern',
+        requirement: 2,
+        reward: 'Reduce lockout by 30s',
+        type: 'pattern',
+        puzzle: '2, 4, 8, 16, ?',
+        answer: '32'
+    },
+    {
+        id: 'speed1',
+        title: 'Rapid Input',
+        description: 'Type the code in under 5 seconds',
+        requirement: 3,
+        reward: 'Reduce cooldown by 10 min',
+        type: 'typing',
+        puzzle: 'QUANTUM',
+        answer: 'QUANTUM'
+    },
+    {
+        id: 'memory1',
+        title: 'Memory Protocol',
+        description: 'Recall and enter the shown sequence',
+        requirement: 4,
+        reward: 'Reduce cooldown by 10 min',
+        type: 'memory',
+        puzzle: ['7', '3', '9', '1', '5'],
+        answer: '73915'
+    }
+];
+
+function updateMissions() {
+    const grid = document.getElementById('missions-grid');
+    grid.innerHTML = '';
+    
+    sideMissions.forEach(mission => {
+        const isUnlocked = gameState.redeemedCodes.length >= mission.requirement;
+        const isCompleted = gameState.completedMissions.includes(mission.id);
+        
+        const card = document.createElement('div');
+        card.className = `mission-card ${isUnlocked ? '' : 'locked'} ${isCompleted ? 'completed' : ''}`;
+        card.innerHTML = `
+            <h3>${mission.title}</h3>
+            <p>${mission.description}</p>
+            <p style="font-size: 0.9em; color: #666; margin-top: 10px;">
+                ${isUnlocked ? '🔓 UNLOCKED' : `🔒 Requires ${mission.requirement} codes`}
+            </p>
+            <p class="mission-reward">⚡ ${mission.reward}</p>
+            ${isUnlocked && !isCompleted ? `<button class="submit-btn" style="margin-top: 15px; padding: 10px 20px; font-size: 0.9em;" onclick="startMission('${mission.id}')">START MISSION</button>` : ''}
+            ${isCompleted ? '<p style="color: var(--warning-orange); margin-top: 10px;">✓ COMPLETED</p>' : ''}
+        `;
+        
+        grid.appendChild(card);
+    });
+}
+
+// Mission UI State
+let currentMission = null;
+let missionStartTime = null;
+let missionTimerInterval = null;
+let memoryCountdownInterval = null;
+
+window.startMission = function(missionId) {
+    const mission = sideMissions.find(m => m.id === missionId);
+    if (!mission) return;
+    
+    currentMission = mission;
+    missionStartTime = null;
+    
+    // Reset modal
+    const modal = document.getElementById('mission-modal');
+    const overlay = document.getElementById('mission-overlay');
+    const title = document.getElementById('mission-modal-title');
+    const instructions = document.getElementById('mission-instructions');
+    const puzzleDisplay = document.getElementById('mission-puzzle-display');
+    const input = document.getElementById('mission-input');
+    const timer = document.getElementById('mission-timer');
+    const feedback = document.getElementById('mission-feedback');
+    const submitBtn = document.getElementById('mission-submit-btn');
+    const cancelBtn = document.getElementById('mission-cancel-btn');
+    const startBtn = document.getElementById('mission-start-btn');
+    
+    // Clear previous state
+    feedback.className = 'mission-feedback';
+    feedback.style.display = 'none';
+    input.value = '';
+    input.style.display = 'none';
+    submitBtn.style.display = 'none';
+    timer.style.display = 'none';
+    
+    // Set title and instructions
+    title.textContent = `◈ ${mission.title.toUpperCase()} ◈`;
+    instructions.textContent = mission.description;
+    
+    // Show modal
+    overlay.classList.add('active');
+    modal.classList.add('active');
+    
+    // Handle different mission types
+    if (mission.type === 'cipher' || mission.type === 'pattern') {
+        puzzleDisplay.textContent = mission.puzzle;
+        puzzleDisplay.style.display = 'flex';
+        input.style.display = 'block';
+        submitBtn.style.display = 'block';
+        input.focus();
+    } else if (mission.type === 'typing') {
+        puzzleDisplay.textContent = mission.puzzle;
+        puzzleDisplay.style.display = 'flex';
+        instructions.textContent = 'Type the text above as fast as you can! You have 5 seconds.';
+        startBtn.style.display = 'block';
+        startBtn.textContent = 'START TYPING';
+    } else if (mission.type === 'memory') {
+        puzzleDisplay.innerHTML = `<div class="memory-sequence">${mission.puzzle.join(' ')}</div>`;
+        puzzleDisplay.style.display = 'flex';
+        instructions.textContent = 'Memorize the sequence above. You have 5 seconds!';
+        startBtn.style.display = 'block';
+        startBtn.textContent = 'START MEMORIZING';
+    }
+    
+    cancelBtn.style.display = 'block';
+};
+
+window.startMissionUI = function() {
+    if (!currentMission) return;
+    
+    const input = document.getElementById('mission-input');
+    const timer = document.getElementById('mission-timer');
+    const puzzleDisplay = document.getElementById('mission-puzzle-display');
+    const startBtn = document.getElementById('mission-start-btn');
+    const submitBtn = document.getElementById('mission-submit-btn');
+    const instructions = document.getElementById('mission-instructions');
+    
+    missionStartTime = Date.now();
+    startBtn.style.display = 'none';
+    
+    if (currentMission.type === 'typing') {
+        // Show input and start timer
+        input.style.display = 'block';
+        input.focus();
+        submitBtn.style.display = 'block';
+        timer.style.display = 'block';
+        
+        let timeLeft = 5;
+        timer.textContent = timeLeft;
+        
+        missionTimerInterval = setInterval(() => {
+            timeLeft--;
+            if (timeLeft > 0) {
+                timer.textContent = timeLeft;
+            } else {
+                timer.textContent = 'TIME UP!';
+                timer.style.color = 'var(--danger-red)';
+                clearInterval(missionTimerInterval);
+                // Auto-submit after timeout
+                setTimeout(() => {
+                    submitMissionAnswer();
+                }, 500);
+            }
+        }, 1000);
+    } else if (currentMission.type === 'memory') {
+        // Hide puzzle and start countdown
+        puzzleDisplay.style.display = 'none';
+        instructions.textContent = 'Memorize the sequence!';
+        timer.style.display = 'block';
+        timer.className = 'mission-timer memory-countdown';
+        
+        let countdown = 5;
+        timer.textContent = countdown;
+        
+        memoryCountdownInterval = setInterval(() => {
+            countdown--;
+            if (countdown > 0) {
+                timer.textContent = countdown;
+            } else {
+                timer.style.display = 'none';
+                clearInterval(memoryCountdownInterval);
+                // Show input after countdown
+                puzzleDisplay.style.display = 'none';
+                input.style.display = 'block';
+                input.focus();
+                submitBtn.style.display = 'block';
+                instructions.textContent = 'Enter the sequence you memorized (no spaces):';
+            }
+        }, 1000);
+    }
+};
+
+window.submitMissionAnswer = function() {
+    if (!currentMission) return;
+    
+    const input = document.getElementById('mission-input');
+    const feedback = document.getElementById('mission-feedback');
+    const submitBtn = document.getElementById('mission-submit-btn');
+    const timer = document.getElementById('mission-timer');
+    
+    // Clear timers
+    if (missionTimerInterval) {
+        clearInterval(missionTimerInterval);
+        missionTimerInterval = null;
+    }
+    if (memoryCountdownInterval) {
+        clearInterval(memoryCountdownInterval);
+        memoryCountdownInterval = null;
+    }
+    
+    const userAnswer = input.value.trim();
+    submitBtn.disabled = true;
+    
+    // Check typing speed for typing missions
+    if (currentMission.type === 'typing') {
+        const elapsed = Date.now() - missionStartTime;
+        if (elapsed > 5000) {
+            feedback.className = 'mission-feedback error';
+            feedback.textContent = '✗ TOO SLOW! You took more than 5 seconds.';
+            feedback.style.display = 'block';
+            submitBtn.disabled = false;
+            return;
+        }
+    }
+    
+    // Check answer
+    if (userAnswer && userAnswer.toUpperCase() === currentMission.answer.toUpperCase()) {
+        // Success!
+        gameState.completedMissions.push(currentMission.id);
+        gameState.systemIntegrity = Math.min(100, gameState.systemIntegrity + 5);
+        
+        feedback.className = 'mission-feedback success';
+        feedback.textContent = `✓ MISSION COMPLETED!\n\n${currentMission.reward}`;
+        feedback.style.display = 'block';
+        
+        saveState();
+        updateStatus();
+        updateMissions();
+        
+        // Close modal after 2 seconds
+        setTimeout(() => {
+            closeMissionModal();
+        }, 2000);
+    } else if (userAnswer) {
+        // Incorrect
+        feedback.className = 'mission-feedback error';
+        feedback.textContent = '✗ INCORRECT. Mission failed.';
+        feedback.style.display = 'block';
+        submitBtn.disabled = false;
+    }
+};
+
+window.closeMissionModal = function() {
+    const modal = document.getElementById('mission-modal');
+    const overlay = document.getElementById('mission-overlay');
+    
+    // Clear timers
+    if (missionTimerInterval) {
+        clearInterval(missionTimerInterval);
+        missionTimerInterval = null;
+    }
+    if (memoryCountdownInterval) {
+        clearInterval(memoryCountdownInterval);
+        memoryCountdownInterval = null;
+    }
+    
+    overlay.classList.remove('active');
+    modal.classList.remove('active');
+    currentMission = null;
+    missionStartTime = null;
+    
+    // Reset all elements
+    const input = document.getElementById('mission-input');
+    const feedback = document.getElementById('mission-feedback');
+    const submitBtn = document.getElementById('mission-submit-btn');
+    const timer = document.getElementById('mission-timer');
+    const startBtn = document.getElementById('mission-start-btn');
+    
+    input.value = '';
+    input.style.display = 'none';
+    feedback.style.display = 'none';
+    submitBtn.style.display = 'none';
+    submitBtn.disabled = false;
+    timer.style.display = 'none';
+    timer.className = 'mission-timer';
+    timer.style.color = '';
+    startBtn.style.display = 'none';
+};
+
+// Close mission modal on overlay click
+document.getElementById('mission-overlay').addEventListener('click', () => {
+    window.closeMissionModal();
+});
+
+// Allow Enter key to submit
+document.getElementById('mission-input').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter' && !document.getElementById('mission-submit-btn').disabled) {
+        submitMissionAnswer();
+    }
+});
+
+// Check for Discord Unlock
+function checkDiscordUnlock() {
+    if (gameState.networkNodes.length >= 20 && !gameState.discordUnlocked) {
+        gameState.discordUnlocked = true;
+        saveState();
+        showDiscordUnlock();
+    }
+}
+
+function showDiscordUnlock() {
+    document.getElementById('discord-overlay').classList.add('active');
+    document.getElementById('discord-modal').classList.add('active');
+    
+    // Trigger celebration effects
+    document.querySelector('.glitch-overlay').classList.add('active');
+    setTimeout(() => {
+        document.querySelector('.glitch-overlay').classList.remove('active');
+    }, 3000);
+}
+
+window.closeDiscordModal = function() {
+    document.getElementById('discord-overlay').classList.remove('active');
+    document.getElementById('discord-modal').classList.remove('active');
+};
+
+// Network Map
+function updateNetworkMap() {
+    const map = document.getElementById('network-map');
+    map.innerHTML = '';
+    
+    // Create 20 nodes in a grid
+    const nodes = [];
+    for (let i = 0; i < 20; i++) {
+        const node = document.createElement('div');
+        node.className = 'node';
+        const x = (i % 5) * 20 + 10;
+        const y = Math.floor(i / 5) * 25 + 10;
+        node.style.left = x + '%';
+        node.style.top = y + '%';
+        
+        // Check if this node is active
+        if (i < gameState.networkNodes.length) {
+            const nodeData = gameState.networkNodes[i];
+            node.classList.add('active');
+            
+            // Set color based on rarity
+            const rarityColors = {
+                classic: '#4a90e2',
+                common: '#7ed321',
+                uncommon: '#50e3c2',
+                rare: '#bd10e0',
+                epic: '#ff6b35',
+                legendary: '#ffd700'
+            };
+            node.style.borderColor = rarityColors[nodeData.rarity];
+            node.style.background = rarityColors[nodeData.rarity];
+        }
+        
+        map.appendChild(node);
+        nodes.push(node);
+    }
+    
+    // Draw connections
+    for (let i = 0; i < nodes.length - 1; i++) {
+        if (i % 5 !== 4) { // Horizontal connections
+            const line = document.createElement('div');
+            line.className = 'node-connection';
+            const rect1 = nodes[i].getBoundingClientRect();
+            const rect2 = nodes[i + 1].getBoundingClientRect();
+            const mapRect = map.getBoundingClientRect();
+            
+            line.style.left = (rect1.left - mapRect.left + 40) + 'px';
+            line.style.top = (rect1.top - mapRect.top + 20) + 'px';
+            line.style.width = (rect2.left - rect1.left - 40) + 'px';
+            
+            if (i < gameState.networkNodes.length - 1) {
+                line.classList.add('active');
+            }
+            
+            map.appendChild(line);
+        }
+    }
+}
+
+// Encrypted Clues
+function generateClue() {
+    const clueTemplates = [
+        'TRANSMISSION INTERCEPTED: ███ ███ BETA',
+        'PARTIAL DECODE: AL█HA ██1',
+        'FREQUENCY ANOMALY DETECTED AT 77.7 MHz',
+        'CIPHER FRAGMENT: ...███...001',
+        'QUANTUM SIGNATURE: ΩΜΕ██ 8█8'
+    ];
+    
+    const clue = clueTemplates[Math.floor(Math.random() * clueTemplates.length)];
+    gameState.encryptedClues.push({
+        text: clue,
+        timestamp: Date.now()
+    });
+    
+    saveState();
+    updateClues();
+}
+
+function updateClues() {
+    const container = document.getElementById('clues-container');
+    const noClues = document.getElementById('no-clues');
+    
+    if (gameState.encryptedClues.length === 0) {
+        noClues.style.display = 'block';
+        container.innerHTML = '';
+        return;
+    }
+    
+    noClues.style.display = 'none';
+    container.innerHTML = '';
+    
+    gameState.encryptedClues.forEach(clue => {
+        const div = document.createElement('div');
+        div.className = 'clue-container';
+        div.innerHTML = `<div class="clue-text">${clue.text}</div>`;
+        container.appendChild(div);
+    });
+}
+
+// Threat Events
+function triggerThreatEvent() {
+    const warning = document.querySelector('.threat-warning');
+    warning.classList.add('active');
+    
+    gameState.systemIntegrity = Math.max(0, gameState.systemIntegrity - 10);
+    updateStatus();
+    
+    setTimeout(() => {
+        warning.classList.remove('active');
+    }, 5000);
+}
+
+// Check for time-based threats
+setInterval(() => {
+    const hour = new Date().getHours();
+    if (hour === 0 && Math.random() > 0.5) {
+        triggerThreatEvent();
+    }
+}, 3600000); // Check every hour
+
+// Agent Name Management
+function getAgentName() {
+    const saved = localStorage.getItem('agentName');
+    return saved || null;
+}
+
+function setAgentName(name) {
+    if (name && name.trim()) {
+        localStorage.setItem('agentName', name.trim());
+    } else {
+        localStorage.removeItem('agentName');
+    }
+    updateAgentNameDisplay();
+}
+
+function getDisplayAgentName() {
+    const agentName = getAgentName();
+    return agentName || 'ANONYMOUS';
+}
+
+// Agent Name Prompt Functions (First Time)
+window.saveAgentName = function() {
+    const input = document.getElementById('agent-name-input');
+    const name = input.value.trim();
+    
+    if (name) {
+        setAgentName(name);
+        showAlert('✅ AGENT IDENTIFIED', `Welcome, Agent ${name.toUpperCase()}. Your identity has been registered.`);
+    } else {
+        continueAnonymous();
+        return;
+    }
+    
+    closeAgentNameModal();
+};
+
+window.continueAnonymous = function() {
+    setAgentName(null);
+    closeAgentNameModal();
+};
+
+function closeAgentNameModal() {
+    document.getElementById('agent-name-overlay').classList.remove('active');
+    document.getElementById('agent-name-modal').classList.remove('active');
+}
+
+function checkFirstTimeUser() {
+    const agentName = getAgentName();
+    const hasSeenPrompt = localStorage.getItem('hasSeenAgentPrompt');
+    
+    if (!hasSeenPrompt) {
+        // First time user - show prompt
+        document.getElementById('agent-name-overlay').classList.add('active');
+        document.getElementById('agent-name-modal').classList.add('active');
+        localStorage.setItem('hasSeenAgentPrompt', 'true');
+    }
+}
+
+// Agent Name Settings Functions
+function updateAgentNameDisplay() {
+    const displayContainer = document.getElementById('agent-name-display-container');
+    const editContainer = document.getElementById('agent-name-edit-container');
+    const currentNameDisplay = document.getElementById('current-agent-name');
+    
+    if (displayContainer && currentNameDisplay) {
+        const agentName = getDisplayAgentName();
+        currentNameDisplay.textContent = agentName;
+        displayContainer.style.display = 'block';
+        editContainer.style.display = 'none';
+    }
+    
+    // Update UI personalization elements
+    updateUIPersonalization();
+}
+
+function updateUIPersonalization() {
+    const agentName = getAgentName();
+    const displayName = agentName ? agentName.toUpperCase() : 'operative';
+    
+    // Update warning box
+    const warningAgentName = document.getElementById('warning-agent-name');
+    if (warningAgentName) {
+        warningAgentName.textContent = displayName;
+    }
+    
+    // Update mission brief
+    const briefAgentName = document.getElementById('brief-agent-name');
+    if (briefAgentName) {
+        briefAgentName.textContent = displayName;
+    }
+}
+
+window.editAgentName = function() {
+    const displayContainer = document.getElementById('agent-name-display-container');
+    const editContainer = document.getElementById('agent-name-edit-container');
+    const editInput = document.getElementById('agent-name-edit-input');
+    
+    displayContainer.style.display = 'none';
+    editContainer.style.display = 'block';
+    
+    const currentName = getAgentName();
+    editInput.value = currentName || '';
+    editInput.focus();
+};
+
+window.cancelEditAgentName = function() {
+    updateAgentNameDisplay();
+};
+
+window.saveEditedAgentName = function() {
+    const editInput = document.getElementById('agent-name-edit-input');
+    const name = editInput.value.trim();
+    
+    if (name) {
+        setAgentName(name);
+        showAlert('✅ AGENT NAME UPDATED', `Your agent name has been updated to: ${name.toUpperCase()}`);
+    } else {
+        removeAgentName();
+        return;
+    }
+    
+    updateAgentNameDisplay();
+};
+
+window.removeAgentName = function() {
+    const confirmed = confirm('Remove agent name and continue as ANONYMOUS?');
+    if (confirmed) {
+        setAgentName(null);
+        showAlert('✅ AGENT NAME REMOVED', 'You are now operating as ANONYMOUS.');
+        updateAgentNameDisplay();
+    }
+};
+
+// Initialize everything
+updateStatus();
+updateLogBook();
+updateMissions();
+updateNetworkMap();
+updateClues();
+updateCooldownDisplay();
+updateAgentNameDisplay();
+updateUIPersonalization();
+
+// Check for first-time user
+checkFirstTimeUser();
+
+if (checkLockout()) {
+    showLockout();
+}
+
+// Mission brief
+document.getElementById('close-alert-btn').addEventListener('click', closeAlert);
+document.getElementById('mission-brief').addEventListener('click', (e) => {
+    e.preventDefault();
+    document.getElementById('brief-overlay').classList.add('active');
+    document.getElementById('mission-brief-modal').classList.add('active');
+});
+
+// Add close function
+window.closeMissionBrief = function() {
+    document.getElementById('brief-overlay').classList.remove('active');
+    document.getElementById('mission-brief-modal').classList.remove('active');
+};
+
+// Close on overlay click
+document.getElementById('brief-overlay').addEventListener('click', () => {
+    closeMissionBrief();
+});
+
+// Settings Modal Functions
+const RESET_COOLDOWN_DAYS = 30;
+const RESET_COOLDOWN_MS = RESET_COOLDOWN_DAYS * 24 * 60 * 60 * 1000;
+
+function getLastResetTimestamp() {
+    const saved = localStorage.getItem('lastDataReset');
+    return saved ? parseInt(saved, 10) : null;
+}
+
+function setLastResetTimestamp() {
+    localStorage.setItem('lastDataReset', Date.now().toString());
+}
+
+function canResetData() {
+    const lastReset = getLastResetTimestamp();
+    if (!lastReset) {
+        return true; // Never reset before
+    }
+    const timeSinceReset = Date.now() - lastReset;
+    return timeSinceReset >= RESET_COOLDOWN_MS;
+}
+
+function getDaysUntilReset() {
+    const lastReset = getLastResetTimestamp();
+    if (!lastReset) {
+        return 0;
+    }
+    const timeSinceReset = Date.now() - lastReset;
+    const remaining = RESET_COOLDOWN_MS - timeSinceReset;
+    if (remaining <= 0) {
+        return 0;
+    }
+    return Math.ceil(remaining / (24 * 60 * 60 * 1000));
+}
+
+function updateResetButtonUI() {
+    const clearBtn = document.getElementById('clear-data-btn');
+    const cooldownInfo = document.getElementById('reset-cooldown-info');
+    
+    if (canResetData()) {
+        clearBtn.disabled = false;
+        cooldownInfo.style.display = 'none';
+    } else {
+        clearBtn.disabled = true;
+        const daysRemaining = getDaysUntilReset();
+        cooldownInfo.style.display = 'block';
+        cooldownInfo.innerHTML = `
+            <strong>⏳ RESET COOLDOWN ACTIVE</strong><br>
+            You must wait <strong>${daysRemaining} day${daysRemaining !== 1 ? 's' : ''}</strong> before you can reset your data again.<br>
+            <span style="font-size: 0.85em; color: #999;">This cooldown prevents accidental data loss.</span>
+        `;
+    }
+}
+
+// Make functions globally accessible (for onclick handlers)
+window.handleClearData = function() {
+    if (!canResetData()) {
+        showAlert('⏳ COOLDOWN ACTIVE', `You must wait ${getDaysUntilReset()} more day(s) before you can reset your data again.`);
+        return;
+    }
+    
+    // Confirm action
+    const confirmed = confirm(
+        '⚠️ FINAL WARNING ⚠️\n\n' +
+        'This will PERMANENTLY DELETE all your local data:\n' +
+        '• All redeemed codes\n' +
+        '• Mission progress\n' +
+        '• Network map\n' +
+        '• Cached data\n' +
+        '• System integrity\n\n' +
+        'This action CANNOT be undone!\n\n' +
+        'Are you absolutely sure you want to continue?'
+    );
+    
+    if (!confirmed) {
+        return;
+    }
+    
+    // Clear all localStorage data
+    localStorage.removeItem('secretTerminalState');
+    
+    // Set reset timestamp (in separate key so it persists)
+    setLastResetTimestamp();
+    
+    // Reset gameState to defaults
+    gameState = {
+        redeemedCodes: [],
+        lockoutEnd: null,
+        cooldownEnd: null,
+        completedMissions: [],
+        networkNodes: [],
+        systemIntegrity: 50,
+        failedAttempts: 0,
+        lastActivity: Date.now(),
+        encryptedClues: [],
+        worldState: 'unstable',
+        discordUnlocked: false,
+        logbookCache: {},
+        lastCacheRefresh: null,
+        firstFailedAttemptTime: null,
+        failedAttemptsInWindow: 0
+    };
+    
+    // Update UI
+    updateStatus();
+    updateLogBook();
+    updateMissions();
+    updateNetworkMap();
+    updateClues();
+    updateCooldownDisplay();
+    updateResetButtonUI();
+    
+    // Close settings modal
+    window.closeSettings();
+    
+    // Show success message
+    showAlert('✅ DATA CLEARED', 'All local data has been successfully cleared. The system has been reset to default state.');
+    
+    // Reload page to ensure clean state
+    setTimeout(() => {
+        window.location.reload();
+    }, 2000);
+};
+
+function openSettings() {
+    document.getElementById('settings-overlay').classList.add('active');
+    document.getElementById('settings-modal').classList.add('active');
+    updateResetButtonUI();
+    updateAgentNameDisplay();
+}
+
+window.closeSettings = function() {
+    document.getElementById('settings-overlay').classList.remove('active');
+    document.getElementById('settings-modal').classList.remove('active');
+};
+
+// Settings link event listener
+document.getElementById('settings-link').addEventListener('click', (e) => {
+    e.preventDefault();
+    openSettings();
+});
+
+// Close settings on overlay click
+document.getElementById('settings-overlay').addEventListener('click', () => {
+    window.closeSettings();
+});
+    </script>
+</body>
+</html>
