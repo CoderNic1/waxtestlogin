@@ -1,732 +1,1026 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>WAX Transfer</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet" />
-  <style>
-    :root {
-      --bg: #0a0a0f;
-      --surface: #111118;
-      --card: #16161f;
-      --border: #252530;
-      --accent: #f5a623;
-      --accent2: #ff6b35;
-      --green: #00e676;
-      --red: #ff1744;
-      --text: #e8e8f0;
-      --muted: #6b6b80;
-      --glow: rgba(245, 166, 35, 0.15);
-    }
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>WAXSEND — WAX Wallet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#080b10;--s1:#0d1117;--s2:#111820;--card:#141c25;--border:#1e2d3d;
+  --accent:#f7b731;--a2:#ff6b35;--a3:#00e5ff;
+  --green:#39ff87;--red:#ff3a5c;--muted:#4a6280;--text:#d6e8f7;--text2:#8aafc7;
+  --r:14px;--shadow:0 8px 32px rgba(0,0,0,.5);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;}
+body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column;}
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+/* ── Scrollbar ── */
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
 
-    body {
-      font-family: 'Syne', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      overflow-x: hidden;
-    }
+/* ── Background grid ── */
+body::before{content:'';position:fixed;inset:0;
+  background-image:linear-gradient(rgba(0,229,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,.025) 1px,transparent 1px);
+  background-size:48px 48px;pointer-events:none;z-index:0;}
 
-    /* Background grain + grid */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(245,166,35,0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(245,166,35,0.03) 1px, transparent 1px);
-      background-size: 40px 40px;
-      pointer-events: none;
-      z-index: 0;
-    }
+/* ── Blob ── */
+.blob{position:fixed;border-radius:50%;filter:blur(90px);pointer-events:none;z-index:0;}
+.b1{width:500px;height:500px;background:rgba(247,183,49,.04);top:-150px;right:-100px;}
+.b2{width:400px;height:400px;background:rgba(0,229,255,.03);bottom:-50px;left:-120px;}
 
-    /* Ambient glow blobs */
-    .blob {
-      position: fixed;
-      border-radius: 50%;
-      filter: blur(80px);
-      pointer-events: none;
-      z-index: 0;
-    }
-    .blob-1 {
-      width: 400px; height: 400px;
-      background: rgba(245, 166, 35, 0.06);
-      top: -100px; right: -100px;
-    }
-    .blob-2 {
-      width: 300px; height: 300px;
-      background: rgba(255, 107, 53, 0.05);
-      bottom: 100px; left: -80px;
-    }
+/* ── App shell ── */
+#app{position:relative;z-index:1;display:flex;flex-direction:column;height:100%;}
 
-    /* Header */
-    header {
-      position: relative;
-      z-index: 10;
-      width: 100%;
-      max-width: 520px;
-      padding: 40px 24px 0;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
+/* ── Topbar ── */
+#topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 20px;background:rgba(13,17,23,.9);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);flex-shrink:0;
+}
+.logo{display:flex;align-items:center;gap:9px;text-decoration:none;}
+.logo-mark{width:32px;height:32px;background:linear-gradient(135deg,var(--accent),var(--a2));border-radius:8px;
+  display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#000;}
+.logo-name{font-size:17px;font-weight:800;letter-spacing:.06em;
+  background:linear-gradient(90deg,var(--accent),var(--a2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.acct-pill{display:none;align-items:center;gap:7px;background:var(--card);border:1px solid var(--border);
+  border-radius:100px;padding:5px 12px 5px 7px;font-family:'Space Mono',monospace;font-size:11px;color:var(--text2);max-width:180px;}
+.acct-pill.on{display:flex;}
+.dot{width:7px;height:7px;background:var(--green);border-radius:50%;box-shadow:0 0 7px var(--green);animation:pulse 2s infinite;flex-shrink:0;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+.acct-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .logo-icon {
-      width: 36px; height: 36px;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 16px;
-      font-weight: 800;
-      color: #000;
-    }
-    .logo-text {
-      font-size: 18px;
-      font-weight: 800;
-      letter-spacing: 0.05em;
-      background: linear-gradient(90deg, var(--accent), var(--accent2));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
+/* ── Bottom nav ── */
+#nav{
+  display:none;flex-shrink:0;
+  background:rgba(13,17,23,.95);backdrop-filter:blur(14px);
+  border-top:1px solid var(--border);
+  padding:0 0 env(safe-area-inset-bottom,0);
+}
+#nav.on{display:flex;}
+#nav button{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;
+  background:none;border:none;color:var(--muted);padding:10px 6px;cursor:pointer;
+  font-family:'Syne',sans-serif;font-size:10px;font-weight:600;letter-spacing:.06em;transition:color .2s;
+}
+#nav button.active{color:var(--accent);}
+#nav button .n-icon{font-size:20px;transition:transform .2s;}
+#nav button.active .n-icon{transform:translateY(-2px);}
 
-    /* Session pill */
-    #session-pill {
-      display: none;
-      align-items: center;
-      gap: 8px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 100px;
-      padding: 6px 14px 6px 8px;
-      font-family: 'Space Mono', monospace;
-      font-size: 11px;
-      color: var(--muted);
-    }
-    #session-pill.visible { display: flex; }
-    .dot {
-      width: 7px; height: 7px;
-      background: var(--green);
-      border-radius: 50%;
-      box-shadow: 0 0 6px var(--green);
-      animation: pulse 2s infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.4; }
-    }
+/* ── Page container ── */
+#pages{flex:1;overflow:hidden;position:relative;}
+.page{position:absolute;inset:0;overflow-y:auto;padding:20px;display:none;animation:fadeIn .25s ease;}
+.page.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
 
-    /* Main card */
-    main {
-      position: relative;
-      z-index: 10;
-      width: 100%;
-      max-width: 520px;
-      padding: 24px;
-    }
+/* ── Login page ── */
+#page-login{display:flex;align-items:center;justify-content:center;}
+.login-wrap{width:100%;max-width:440px;}
+.login-badge{display:inline-flex;align-items:center;gap:6px;font-family:'Space Mono',monospace;font-size:10px;
+  letter-spacing:.14em;color:var(--accent);text-transform:uppercase;background:rgba(247,183,49,.08);
+  border:1px solid rgba(247,183,49,.2);border-radius:100px;padding:4px 12px;margin-bottom:22px;}
+.login-h{font-size:34px;font-weight:800;line-height:1.1;margin-bottom:10px;}
+.login-h span{background:linear-gradient(135deg,var(--accent),var(--a2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.login-sub{color:var(--text2);font-size:14px;line-height:1.6;margin-bottom:32px;}
+.w-btn{display:flex;align-items:center;gap:14px;padding:15px 18px;background:var(--card);
+  border:1px solid var(--border);border-radius:var(--r);cursor:pointer;width:100%;color:var(--text);
+  font-family:'Syne',sans-serif;margin-bottom:10px;transition:all .2s;}
+.w-btn:hover{border-color:var(--accent);background:rgba(247,183,49,.04);transform:translateY(-1px);}
+.w-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.w-icon.anc{background:rgba(83,126,255,.15);}
+.w-icon.cld{background:rgba(247,183,49,.12);}
+.w-inf{flex:1;text-align:left;}
+.w-name{font-size:14px;font-weight:700;}
+.w-desc{font-size:11px;color:var(--muted);}
+.w-arr{color:var(--muted);transition:transform .2s,color .2s;}
+.w-btn:hover .w-arr{transform:translateX(3px);color:var(--accent);}
+.divider-line{display:flex;align-items:center;gap:10px;margin:6px 0;}
+.divider-line::before,.divider-line::after{content:'';flex:1;height:1px;background:var(--border);}
+.divider-line span{font-size:10px;color:var(--muted);font-family:'Space Mono',monospace;}
+#login-status{font-size:12px;color:var(--muted);text-align:center;margin-top:14px;font-family:'Space Mono',monospace;min-height:18px;}
 
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      overflow: hidden;
-      box-shadow: 0 0 0 1px rgba(255,255,255,0.03), 0 40px 80px rgba(0,0,0,0.4);
-    }
+/* ── Cards / surface ── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);}
+.section-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:10px;}
+.section-title{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);}
 
-    /* Login panel */
-    #login-panel {
-      padding: 48px 40px;
-      text-align: center;
-    }
-    .panel-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-family: 'Space Mono', monospace;
-      font-size: 10px;
-      letter-spacing: 0.15em;
-      color: var(--accent);
-      text-transform: uppercase;
-      background: rgba(245,166,35,0.08);
-      border: 1px solid rgba(245,166,35,0.2);
-      border-radius: 100px;
-      padding: 4px 12px;
-      margin-bottom: 24px;
-    }
-    h1 {
-      font-size: 32px;
-      font-weight: 800;
-      line-height: 1.1;
-      margin-bottom: 12px;
-    }
-    h1 span {
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .subtitle {
-      color: var(--muted);
-      font-size: 15px;
-      line-height: 1.6;
-      margin-bottom: 36px;
-    }
+/* ── Search bar ── */
+.search-wrap{position:relative;margin-bottom:14px;}
+.search-wrap input{width:100%;background:var(--s2);border:1px solid var(--border);border-radius:10px;
+  padding:10px 14px 10px 36px;color:var(--text);font-family:'Space Mono',monospace;font-size:12px;outline:none;transition:border-color .2s;}
+.search-wrap input:focus{border-color:var(--accent);}
+.search-wrap input::placeholder{color:var(--muted);}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:14px;pointer-events:none;}
 
-    /* Wallet options */
-    .wallet-options {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-bottom: 24px;
-    }
-    .wallet-btn {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 16px 20px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      cursor: pointer;
-      transition: all 0.2s;
-      text-align: left;
-      width: 100%;
-      color: var(--text);
-      font-family: 'Syne', sans-serif;
-    }
-    .wallet-btn:hover {
-      border-color: var(--accent);
-      background: rgba(245,166,35,0.04);
-      transform: translateY(-1px);
-      box-shadow: 0 8px 24px rgba(0,0,0,0.3), 0 0 0 1px rgba(245,166,35,0.1);
-    }
-    .wallet-btn:active { transform: translateY(0); }
-    .wallet-icon {
-      width: 40px; height: 40px;
-      border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 20px;
-      flex-shrink: 0;
-    }
-    .wallet-icon.anchor { background: rgba(83,126,255,0.15); }
-    .wallet-icon.cloud  { background: rgba(245,166,35,0.15); }
-    .wallet-info { flex: 1; }
-    .wallet-name {
-      font-size: 15px;
-      font-weight: 700;
-      margin-bottom: 2px;
-    }
-    .wallet-desc {
-      font-size: 12px;
-      color: var(--muted);
-    }
-    .wallet-arrow {
-      color: var(--muted);
-      font-size: 18px;
-      transition: transform 0.2s;
-    }
-    .wallet-btn:hover .wallet-arrow { transform: translateX(3px); color: var(--accent); }
+/* ── Dashboard layout ── */
+#page-home .dashboard{display:grid;grid-template-columns:1fr 1fr;gap:16px;height:100%;}
+@media(max-width:640px){#page-home .dashboard{grid-template-columns:1fr;}}
+.dash-col{display:flex;flex-direction:column;min-height:0;}
+.dash-col .card{flex:1;overflow:hidden;display:flex;flex-direction:column;padding:16px;}
+.scroll-list{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;}
 
-    .divider {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin: 8px 0;
-    }
-    .divider::before, .divider::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--border);
-    }
-    .divider span {
-      font-size: 11px;
-      color: var(--muted);
-      font-family: 'Space Mono', monospace;
-    }
+/* ── Contact cards ── */
+.contact-card{background:var(--s2);border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:border-color .2s;}
+.contact-card:hover{border-color:rgba(247,183,49,.3);}
+.contact-head{display:flex;align-items:center;gap:10px;padding:11px 13px;cursor:pointer;}
+.contact-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--a2));
+  display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#000;flex-shrink:0;}
+.contact-main{flex:1;min-width:0;}
+.contact-name{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.contact-wallet{font-family:'Space Mono',monospace;font-size:10px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.contact-chevron{color:var(--muted);font-size:12px;transition:transform .25s;flex-shrink:0;}
+.contact-card.open .contact-chevron{transform:rotate(180deg);}
+.contact-body{display:none;padding:0 13px 13px;border-top:1px solid var(--border);margin-top:0;}
+.contact-card.open .contact-body{display:block;}
+.cinfo-row{display:flex;gap:6px;align-items:flex-start;margin-top:10px;font-size:12px;}
+.cinfo-lbl{color:var(--muted);font-family:'Space Mono',monospace;font-size:10px;flex-shrink:0;padding-top:1px;min-width:60px;}
+.cinfo-val{color:var(--text2);word-break:break-all;flex:1;}
+.c-actions{display:flex;gap:6px;margin-top:12px;}
+.c-btn{flex:1;padding:7px;background:var(--s1);border:1px solid var(--border);border-radius:8px;
+  color:var(--text2);font-family:'Space Mono',monospace;font-size:10px;cursor:pointer;transition:all .2s;}
+.c-btn:hover{border-color:var(--accent);color:var(--accent);}
+.c-btn.del:hover{border-color:var(--red);color:var(--red);}
+.c-btn.send-c:hover{border-color:var(--green);color:var(--green);}
+.sent-total{font-family:'Space Mono',monospace;font-size:10px;color:var(--text2);margin-top:8px;
+  background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.12);border-radius:6px;padding:6px 10px;}
+.sent-total strong{color:var(--a3);}
 
-    /* Transfer panel */
-    #transfer-panel { display: none; }
-    #transfer-panel.visible { display: block; }
+/* ── Token row ── */
+.token-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--s2);
+  border:1px solid var(--border);border-radius:10px;transition:border-color .2s;}
+.token-row:hover{border-color:rgba(247,183,49,.2);}
+.token-icon{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#1e3a4a,#2a4d63);
+  display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--accent);flex-shrink:0;}
+.token-info{flex:1;min-width:0;}
+.token-sym{font-size:13px;font-weight:700;}
+.token-contract{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);}
+.token-balance{font-family:'Space Mono',monospace;font-size:13px;color:var(--text);text-align:right;flex-shrink:0;}
+.token-loading{text-align:center;padding:24px;color:var(--muted);font-size:13px;font-family:'Space Mono',monospace;}
 
-    .panel-header {
-      padding: 24px 28px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .panel-title {
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
-    .account-tag {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-family: 'Space Mono', monospace;
-      font-size: 12px;
-      color: var(--accent);
-      background: rgba(245,166,35,0.08);
-      padding: 4px 10px;
-      border-radius: 100px;
-    }
+/* ── Buttons ── */
+.btn-primary{display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:12px 18px;background:linear-gradient(135deg,var(--accent),var(--a2));
+  border:none;border-radius:10px;color:#000;font-family:'Syne',sans-serif;
+  font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;width:100%;}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(247,183,49,.3);}
+.btn-primary:active{transform:none;}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none;}
+.btn-ghost{background:none;border:1px solid var(--border);border-radius:8px;padding:7px 14px;
+  color:var(--text2);font-family:'Space Mono',monospace;font-size:11px;cursor:pointer;transition:all .2s;}
+.btn-ghost:hover{border-color:var(--text2);color:var(--text);}
+.btn-icon{background:none;border:none;cursor:pointer;color:var(--accent);font-size:18px;padding:4px;transition:transform .2s;}
+.btn-icon:hover{transform:scale(1.15);}
 
-    .form-body {
-      padding: 28px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
+/* ── Send page ── */
+#page-send .send-card{max-width:500px;margin:0 auto;padding:24px;}
+.field{display:flex;flex-direction:column;gap:7px;margin-bottom:18px;}
+.field label{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);}
+.field input,.field textarea,.field select{
+  background:var(--s2);border:1px solid var(--border);border-radius:10px;
+  padding:12px 14px;color:var(--text);font-family:'Space Mono',monospace;font-size:13px;outline:none;
+  transition:border-color .2s,box-shadow .2s;width:100%;}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(247,183,49,.1);}
+.field input::placeholder,.field textarea::placeholder{color:var(--muted);}
+.field select{-webkit-appearance:none;appearance:none;cursor:pointer;}
+.input-row{display:flex;gap:8px;align-items:flex-end;}
+.input-row .field{flex:1;}
+.amount-wrap{position:relative;}
+.amount-wrap input{padding-right:56px;}
+.amount-suf{position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:var(--accent);}
+.or-divider{display:flex;align-items:center;gap:8px;margin:8px 0;}
+.or-divider::before,.or-divider::after{content:'';flex:1;height:1px;background:var(--border);}
+.or-divider span{font-size:10px;color:var(--muted);font-family:'Space Mono',monospace;}
+.contact-pick{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-bottom:18px;}
+.cpick{padding:10px 12px;background:var(--s2);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:all .2s;text-align:left;}
+.cpick:hover,.cpick.sel{border-color:var(--accent);background:rgba(247,183,49,.05);}
+.cpick-name{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cpick-wallet{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.token-select-list{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px;}
+.tsym{padding:6px 12px;background:var(--s2);border:1px solid var(--border);border-radius:100px;
+  cursor:pointer;font-family:'Space Mono',monospace;font-size:11px;color:var(--text2);transition:all .2s;}
+.tsym:hover,.tsym.sel{background:rgba(247,183,49,.1);border-color:var(--accent);color:var(--accent);}
 
-    .field {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    label {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
-    input {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px 16px;
-      color: var(--text);
-      font-family: 'Space Mono', monospace;
-      font-size: 14px;
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-      width: 100%;
-    }
-    input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(245,166,35,0.1);
-    }
-    input::placeholder { color: var(--muted); }
+/* ── Contacts tab ── */
+#page-contacts .tab-bar{display:flex;gap:0;margin-bottom:16px;background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:3px;}
+#page-contacts .tab-bar button{flex:1;padding:8px;background:none;border:none;color:var(--muted);
+  font-family:'Syne',sans-serif;font-size:13px;font-weight:600;cursor:pointer;border-radius:7px;transition:all .2s;}
+#page-contacts .tab-bar button.active{background:var(--card);color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,.3);}
 
-    /* Amount field with WAX suffix */
-    .amount-wrap {
-      position: relative;
-    }
-    .amount-wrap input { padding-right: 58px; }
-    .amount-suffix {
-      position: absolute;
-      right: 16px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-family: 'Space Mono', monospace;
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--accent);
-    }
+/* ── New contact form ── */
+#contact-form-wrap{display:none;}
+#contact-form-wrap.visible{display:block;}
+#contact-list-wrap{display:block;}
+#contact-list-wrap.hidden{display:none;}
 
-    /* Send button */
-    .send-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      padding: 16px;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      border: none;
-      border-radius: 14px;
-      color: #000;
-      font-family: 'Syne', sans-serif;
-      font-size: 15px;
-      font-weight: 800;
-      letter-spacing: 0.05em;
-      cursor: pointer;
-      transition: all 0.2s;
-      width: 100%;
-      margin-top: 4px;
-    }
-    .send-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 12px 32px rgba(245,166,35,0.3);
-    }
-    .send-btn:active { transform: translateY(0); }
-    .send-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-    }
+/* ── Modal / overlay ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);z-index:200;
+  display:none;align-items:center;justify-content:center;padding:20px;}
+.overlay.open{display:flex;}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:24px;
+  max-width:360px;width:100%;box-shadow:0 24px 60px rgba(0,0,0,.6);}
+.modal h3{font-size:16px;font-weight:700;margin-bottom:8px;}
+.modal p{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:20px;}
+.modal-actions{display:flex;gap:8px;}
+.modal-actions button{flex:1;padding:10px;border-radius:8px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all .2s;}
+.modal-confirm{background:var(--red);color:#fff;}
+.modal-confirm:hover{background:#cc2a48;}
+.modal-cancel{background:var(--s2);color:var(--text);border:1px solid var(--border)!important;}
 
-    /* Logout */
-    .logout-row {
-      padding: 16px 28px;
-      border-top: 1px solid var(--border);
-      display: flex;
-      justify-content: flex-end;
-    }
-    .logout-btn {
-      background: none;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 7px 14px;
-      color: var(--muted);
-      font-family: 'Space Mono', monospace;
-      font-size: 11px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .logout-btn:hover { border-color: var(--red); color: var(--red); }
+/* ── Toast ── */
+#toast{position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 70px);left:50%;
+  transform:translateX(-50%) translateY(120px);background:var(--card);border:1px solid var(--border);
+  border-radius:12px;padding:12px 18px;font-size:12px;font-family:'Space Mono',monospace;
+  display:flex;align-items:center;gap:8px;z-index:300;transition:transform .4s cubic-bezier(.34,1.56,.64,1);
+  box-shadow:0 16px 48px rgba(0,0,0,.5);white-space:nowrap;max-width:90vw;}
+@media(max-width:640px){#toast{bottom:calc(env(safe-area-inset-bottom,0px) + 80px);}}
+#toast.show{transform:translateX(-50%) translateY(0);}
+#toast.success{border-color:rgba(57,255,135,.3);}
+#toast.error{border-color:rgba(255,58,92,.3);}
+.t-icon{font-size:14px;}
 
-    /* Toast */
-    #toast {
-      position: fixed;
-      bottom: 32px;
-      left: 50%;
-      transform: translateX(-50%) translateY(100px);
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 14px 20px;
-      font-size: 13px;
-      font-family: 'Space Mono', monospace;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      z-index: 100;
-      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-      white-space: nowrap;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-      max-width: 90vw;
-      white-space: normal;
-      word-break: break-all;
-    }
-    #toast.show { transform: translateX(-50%) translateY(0); }
-    #toast.success { border-color: rgba(0,230,118,0.3); }
-    #toast.error   { border-color: rgba(255,23,68,0.3); }
-    .toast-icon { font-size: 16px; flex-shrink: 0; }
+/* ── Spinner ── */
+.spinner{width:14px;height:14px;border:2px solid rgba(0,0,0,.3);border-top-color:#000;border-radius:50%;animation:spin .7s linear infinite;display:none;flex-shrink:0;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.btn-primary.loading .spinner{display:block;}
+.btn-primary.loading .btn-text{display:none;}
 
-    /* Loading spinner */
-    .spinner {
-      width: 16px; height: 16px;
-      border: 2px solid rgba(0,0,0,0.3);
-      border-top-color: #000;
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      display: none;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .send-btn.loading .spinner { display: block; }
-    .send-btn.loading .btn-text { display: none; }
+/* ── Tx result ── */
+.tx-result{background:rgba(57,255,135,.05);border:1px solid rgba(57,255,135,.2);border-radius:10px;
+  padding:12px 14px;font-family:'Space Mono',monospace;font-size:11px;color:var(--green);
+  word-break:break-all;line-height:1.7;margin-top:14px;display:none;}
+.tx-result a{color:var(--accent);text-decoration:none;}
+.tx-result a:hover{text-decoration:underline;}
 
-    /* Tx success box */
-    #tx-result {
-      display: none;
-      margin: 0 28px 20px;
-      padding: 14px 16px;
-      background: rgba(0,230,118,0.06);
-      border: 1px solid rgba(0,230,118,0.2);
-      border-radius: 12px;
-      font-family: 'Space Mono', monospace;
-      font-size: 11px;
-      color: var(--green);
-      word-break: break-all;
-      line-height: 1.6;
-    }
-    #tx-result a {
-      color: var(--accent);
-      text-decoration: none;
-    }
-    #tx-result a:hover { text-decoration: underline; }
+/* ── Settings page ── */
+#page-settings .settings-card{max-width:480px;margin:0 auto;padding:24px;}
+.setting-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border);gap:16px;}
+.setting-row:last-child{border-bottom:none;}
+.setting-lbl{font-size:14px;font-weight:600;}
+.setting-sub{font-size:12px;color:var(--muted);margin-top:3px;}
+.btn-danger{padding:9px 16px;background:rgba(255,58,92,.1);border:1px solid rgba(255,58,92,.3);
+  border-radius:8px;color:var(--red);font-family:'Space Mono',monospace;font-size:11px;cursor:pointer;transition:all .2s;}
+.btn-danger:hover{background:rgba(255,58,92,.2);}
 
-    /* Login loading state */
-    #login-status {
-      font-size: 13px;
-      color: var(--muted);
-      text-align: center;
-      min-height: 20px;
-      font-family: 'Space Mono', monospace;
-    }
-  </style>
+/* ── Empty states ── */
+.empty{text-align:center;padding:32px 16px;color:var(--muted);font-size:13px;}
+.empty-icon{font-size:32px;margin-bottom:8px;opacity:.5;}
+
+/* ── Responsiveness ── */
+@media(max-width:640px){
+  .page{padding:14px;}
+  #page-home .dashboard{gap:12px;}
+  .login-h{font-size:26px;}
+}
+</style>
 </head>
 <body>
-  <div class="blob blob-1"></div>
-  <div class="blob blob-2"></div>
-
-  <header>
-    <div class="logo">
-      <div class="logo-icon">W</div>
-      <div class="logo-text">WAXSEND</div>
-    </div>
-    <div id="session-pill">
-      <div class="dot"></div>
-      <span id="session-account">...</span>
-    </div>
-  </header>
-
-  <main>
-    <div class="card">
-      <!-- LOGIN PANEL -->
-      <div id="login-panel">
-        <div class="panel-badge">⬡ WAX Blockchain</div>
-        <h1>Connect your<br><span>WAX Wallet</span></h1>
-        <p class="subtitle">Send WAXP tokens securely.<br>Your keys never leave your wallet.</p>
-
-        <div class="wallet-options">
-          <button class="wallet-btn" id="btn-anchor">
-            <div class="wallet-icon anchor">⚓</div>
-            <div class="wallet-info">
-              <div class="wallet-name">Anchor Wallet</div>
-              <div class="wallet-desc">Desktop & mobile EOSIO wallet</div>
-            </div>
-            <div class="wallet-arrow">→</div>
-          </button>
-
-          <div class="divider"><span>or</span></div>
-
-          <button class="wallet-btn" id="btn-cloud">
-            <div class="wallet-icon cloud">☁️</div>
-            <div class="wallet-info">
-              <div class="wallet-name">MyCloudWallet</div>
-              <div class="wallet-desc">Web-based WAX wallet</div>
-            </div>
-            <div class="wallet-arrow">→</div>
-          </button>
-        </div>
-
-        <div id="login-status"></div>
-      </div>
-
-      <!-- TRANSFER PANEL -->
-      <div id="transfer-panel">
-        <div class="panel-header">
-          <div class="panel-title">Send WAXP</div>
-          <div class="account-tag">
-            <span>◉</span>
-            <span id="logged-account">—</span>
-          </div>
-        </div>
-
-        <div class="form-body">
-          <div class="field">
-            <label>Recipient Address</label>
-            <input type="text" id="to-address" placeholder="accountname.wam" autocomplete="off" spellcheck="false" />
-          </div>
-
-          <div class="field">
-            <label>Amount</label>
-            <div class="amount-wrap">
-              <input type="number" id="amount" placeholder="0.00000000" min="0.00000001" step="0.00000001" />
-              <div class="amount-suffix">WAXP</div>
-            </div>
-          </div>
-
-          <div class="field">
-            <label>Memo <span style="color:var(--muted);font-weight:400;text-transform:none">(optional)</span></label>
-            <input type="text" id="memo" placeholder="Add a note..." maxlength="256" />
-          </div>
-
-          <button class="send-btn" id="send-btn">
-            <div class="spinner"></div>
-            <span class="btn-text">⚡ Sign &amp; Send Transaction</span>
-          </button>
-        </div>
-
-        <div id="tx-result"></div>
-
-        <div class="logout-row">
-          <button class="logout-btn" id="logout-btn">Disconnect →</button>
-        </div>
-      </div>
-    </div>
-  </main>
-
-  <!-- Toast -->
-  <div id="toast">
-    <span class="toast-icon" id="toast-icon">✓</span>
-    <span id="toast-msg">Message</span>
+<div class="blob b1"></div><div class="blob b2"></div>
+<div id="app">
+  <!-- TOP BAR -->
+  <div id="topbar">
+    <a class="logo" href="#"><div class="logo-mark">W</div><div class="logo-name">WAXSEND</div></a>
+    <div class="acct-pill" id="acct-pill"><div class="dot"></div><span class="acct-name" id="acct-name">—</span></div>
   </div>
 
-  <script type="module">
-    // ── Imports via esm.sh ──────────────────────────────────────────────
-    import { SessionKit } from 'https://esm.sh/@wharfkit/session@1'
-    import { WebRenderer } from 'https://esm.sh/@wharfkit/web-renderer@1'
-    import { WalletPluginAnchor } from 'https://esm.sh/@wharfkit/wallet-plugin-anchor@1'
-    import { WalletPluginCloudWallet } from 'https://esm.sh/@wharfkit/wallet-plugin-cloudwallet@1'
+  <!-- PAGE CONTAINER -->
+  <div id="pages">
+    <!-- LOGIN -->
+    <div class="page active" id="page-login">
+      <div class="login-wrap">
+        <div class="login-badge">⬡ WAX Blockchain</div>
+        <h1 class="login-h">Connect your<br><span>WAX Wallet</span></h1>
+        <p class="login-sub">Manage contacts, send any token.<br>Your keys never leave your wallet.</p>
+        <button class="w-btn" id="btn-anchor">
+          <div class="w-icon anc">⚓</div>
+          <div class="w-inf"><div class="w-name">Anchor Wallet</div><div class="w-desc">Desktop & mobile EOSIO wallet</div></div>
+          <span class="w-arr">→</span>
+        </button>
+        <div class="divider-line"><span>or</span></div>
+        <button class="w-btn" id="btn-cloud">
+          <div class="w-icon cld">☁️</div>
+          <div class="w-inf"><div class="w-name">MyCloudWallet</div><div class="w-desc">Web-based WAX wallet</div></div>
+          <span class="w-arr">→</span>
+        </button>
+        <div id="login-status"></div>
+      </div>
+    </div>
 
-    // ── WAX Mainnet config ──────────────────────────────────────────────
-    const WAX_CHAIN = {
-      id: '1064487b3cd1a897ce03ae5b6a865651747e2e152090f99c1d19d44e01aea5a4',
-      url: 'https://wax.greymass.com',
-    }
+    <!-- HOME / DASHBOARD -->
+    <div class="page" id="page-home">
+      <div class="dashboard">
+        <!-- Contacts column -->
+        <div class="dash-col">
+          <div class="card">
+            <div class="section-hd">
+              <span class="section-title">Contacts</span>
+              <button class="btn-icon" id="goto-new-contact" title="New contact">＋</button>
+            </div>
+            <div class="search-wrap">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="contact-search-home" placeholder="Search contacts…" autocomplete="off"/>
+            </div>
+            <div class="scroll-list" id="contact-list-home"></div>
+          </div>
+        </div>
+        <!-- Tokens column -->
+        <div class="dash-col">
+          <div class="card">
+            <div class="section-hd">
+              <span class="section-title">Your Tokens</span>
+              <button class="btn-ghost" id="refresh-tokens" style="font-size:10px">↻ Refresh</button>
+            </div>
+            <div class="search-wrap">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="token-search" placeholder="Search tokens…" autocomplete="off"/>
+            </div>
+            <div class="scroll-list" id="token-list"></div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-    // ── Init WharfKit ───────────────────────────────────────────────────
-    const webRenderer = new WebRenderer()
+    <!-- SEND -->
+    <div class="page" id="page-send">
+      <div class="card send-card">
+        <div class="section-hd" style="margin-bottom:20px">
+          <span class="section-title">Send Tokens</span>
+        </div>
 
-    const sessionKit = new SessionKit({
-      appName: 'waxsend',
-      chains: [WAX_CHAIN],
-      ui: webRenderer,
-      walletPlugins: [
-        new WalletPluginAnchor(),
-        new WalletPluginCloudWallet(),
-      ],
-    })
+        <div class="field">
+          <label>Recipient Address</label>
+          <input type="text" id="send-to" placeholder="waxaccount.wam" autocomplete="off" spellcheck="false"/>
+        </div>
 
-    // ── State ───────────────────────────────────────────────────────────
-    let session = null
+        <div class="or-divider"><span>or pick contact</span></div>
+        <div class="contact-pick" id="contact-pick"></div>
 
-    // ── DOM refs ────────────────────────────────────────────────────────
-    const loginPanel    = document.getElementById('login-panel')
-    const transferPanel = document.getElementById('transfer-panel')
-    const sessionPill   = document.getElementById('session-pill')
-    const sessionAccount= document.getElementById('session-account')
-    const loggedAccount = document.getElementById('logged-account')
-    const btnAnchor     = document.getElementById('btn-anchor')
-    const btnCloud      = document.getElementById('btn-cloud')
-    const sendBtn       = document.getElementById('send-btn')
-    const logoutBtn     = document.getElementById('logout-btn')
-    const txResult      = document.getElementById('tx-result')
-    const loginStatus   = document.getElementById('login-status')
+        <div class="field">
+          <label>Select Token</label>
+          <div class="token-select-list" id="token-pick"></div>
+          <input type="hidden" id="send-token-sym"/>
+          <input type="hidden" id="send-token-contract"/>
+          <input type="hidden" id="send-token-precision"/>
+        </div>
 
-    // ── Helpers ─────────────────────────────────────────────────────────
-    function showToast(msg, type = 'success') {
-      const toast  = document.getElementById('toast')
-      const icon   = document.getElementById('toast-icon')
-      const msgEl  = document.getElementById('toast-msg')
-      icon.textContent = type === 'success' ? '✓' : '✕'
-      msgEl.textContent = msg
-      toast.className = `show ${type}`
-      clearTimeout(toast._timer)
-      toast._timer = setTimeout(() => toast.className = '', 5000)
-    }
+        <div class="field">
+          <label>Amount</label>
+          <div class="amount-wrap">
+            <input type="number" id="send-amount" placeholder="0.00000000" min="0" step="any"/>
+            <div class="amount-suf" id="send-sym-label">—</div>
+          </div>
+        </div>
 
-    function setLoggedIn(s) {
-      session = s
-      const actor = String(s.actor)
-      loggedAccount.textContent = actor
-      sessionAccount.textContent = actor
-      sessionPill.classList.add('visible')
-      loginPanel.style.display = 'none'
-      transferPanel.classList.add('visible')
-      txResult.style.display = 'none'
-    }
+        <div class="field">
+          <label>Memo <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
+          <input type="text" id="send-memo" placeholder="Add a note…" maxlength="256"/>
+        </div>
 
-    function setLoggedOut() {
-      session = null
-      sessionPill.classList.remove('visible')
-      loginPanel.style.display = 'block'
-      transferPanel.classList.remove('visible')
-      txResult.style.display = 'none'
-      loginStatus.textContent = ''
-    }
+        <button class="btn-primary" id="do-send">
+          <div class="spinner"></div>
+          <span class="btn-text">⚡ Sign & Send</span>
+        </button>
+        <div class="tx-result" id="tx-result"></div>
+      </div>
+    </div>
 
-    // ── Restore session on load ─────────────────────────────────────────
-    try {
-      const restored = await sessionKit.restore()
-      if (restored) setLoggedIn(restored)
-    } catch(e) {
-      console.warn('Restore failed:', e)
-    }
+    <!-- CONTACTS MANAGEMENT -->
+    <div class="page" id="page-contacts">
+      <div style="max-width:520px;margin:0 auto;">
+        <div class="tab-bar">
+          <button class="active" id="tab-list" onclick="showContactTab('list')">Contact List</button>
+          <button id="tab-new" onclick="showContactTab('new')">＋ New Contact</button>
+        </div>
 
-    // ── Login with a specific wallet ────────────────────────────────────
-    async function login(walletPlugin) {
-      loginStatus.textContent = 'Connecting…'
-      btnAnchor.disabled = true
-      btnCloud.disabled  = true
-      try {
-        const result = await sessionKit.login({ walletPlugin })
-        setLoggedIn(result.session)
-        showToast(`Connected as ${String(result.session.actor)}`)
-      } catch(e) {
-        console.error(e)
-        showToast(e.message || 'Login cancelled', 'error')
-        loginStatus.textContent = ''
-      } finally {
-        btnAnchor.disabled = false
-        btnCloud.disabled  = false
+        <!-- Contact list -->
+        <div id="contact-list-wrap">
+          <div class="search-wrap">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="contact-search-page" placeholder="Search…" autocomplete="off"/>
+          </div>
+          <div id="contact-list-page" style="display:flex;flex-direction:column;gap:8px;"></div>
+        </div>
+
+        <!-- New / edit form -->
+        <div id="contact-form-wrap">
+          <div class="card" style="padding:22px;">
+            <h3 style="font-size:16px;font-weight:800;margin-bottom:18px;" id="form-title">New Contact</h3>
+            <input type="hidden" id="edit-id"/>
+            <div class="field"><label>Display Name *</label><input type="text" id="cf-name" placeholder="e.g. CryptoFriend" autocomplete="off"/></div>
+            <div class="field"><label>WAX Wallet *</label><input type="text" id="cf-wallet" placeholder="accountname.wam" autocomplete="off" spellcheck="false"/></div>
+            <div class="field"><label>Discord Username</label><input type="text" id="cf-discord" placeholder="username#0000" autocomplete="off"/></div>
+            <div class="field"><label>Discord ID (optional)</label><input type="text" id="cf-discord-id" placeholder="123456789012345678" autocomplete="off"/></div>
+            <div class="field"><label>Description (optional)</label><input type="text" id="cf-desc" placeholder="How do you know them?" autocomplete="off"/></div>
+            <div style="display:flex;gap:8px;">
+              <button class="btn-ghost" onclick="showContactTab('list')" style="flex:1;">Cancel</button>
+              <button class="btn-primary" id="save-contact-btn" onclick="saveContact()" style="flex:2;">
+                <span class="btn-text">Save Contact</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="page" id="page-settings">
+      <div class="card settings-card">
+        <div class="section-title" style="margin-bottom:20px;">Settings</div>
+
+        <div class="setting-row">
+          <div><div class="setting-lbl">Connected Account</div><div class="setting-sub" id="settings-acct">—</div></div>
+          <button class="btn-ghost" id="disconnect-btn">Disconnect</button>
+        </div>
+
+        <div class="setting-row">
+          <div>
+            <div class="setting-lbl">Clear All Local Data</div>
+            <div class="setting-sub">Removes contacts & saved history from this browser</div>
+          </div>
+          <button class="btn-danger" id="clear-data-btn">Clear Data</button>
+        </div>
+
+        <div class="setting-row">
+          <div>
+            <div class="setting-lbl">About</div>
+            <div class="setting-sub">WAXSEND v2.0 · Built with WharfKit</div>
+          </div>
+        </div>
+
+        <div style="margin-top:24px;font-size:11px;color:var(--muted);font-family:'Space Mono',monospace;line-height:1.8;">
+          🔒 All data stored locally in your browser.<br>
+          Keys never leave your wallet software.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav id="nav">
+    <button id="nav-home" onclick="navTo('home')"><span class="n-icon">⌂</span>Home</button>
+    <button id="nav-send" onclick="navTo('send')"><span class="n-icon">↗</span>Send</button>
+    <button id="nav-contacts" onclick="navTo('contacts')"><span class="n-icon">◎</span>Contacts</button>
+    <button id="nav-settings" onclick="navTo('settings')"><span class="n-icon">⚙</span>Settings</button>
+  </nav>
+</div>
+
+<!-- MODALS -->
+<div class="overlay" id="modal-delete"><div class="modal">
+  <h3>Delete Contact?</h3>
+  <p id="modal-del-msg">This will permanently remove this contact. This action cannot be undone.</p>
+  <div class="modal-actions">
+    <button class="modal-cancel" onclick="closeModal('modal-delete')">Cancel</button>
+    <button class="modal-confirm" id="modal-del-confirm">Delete</button>
+  </div>
+</div></div>
+
+<div class="overlay" id="modal-clear"><div class="modal">
+  <h3>⚠️ Clear All Data?</h3>
+  <p>This will permanently delete all your contacts and local history. Your wallet connection will remain intact. This cannot be undone.</p>
+  <div class="modal-actions">
+    <button class="modal-cancel" onclick="closeModal('modal-clear')">Cancel</button>
+    <button class="modal-confirm" id="modal-clear-confirm1">Yes, clear it</button>
+  </div>
+</div></div>
+
+<div class="overlay" id="modal-clear2"><div class="modal">
+  <h3>🚨 Are you absolutely sure?</h3>
+  <p>Final confirmation: all locally stored contacts and transaction history will be wiped.</p>
+  <div class="modal-actions">
+    <button class="modal-cancel" onclick="closeModal('modal-clear2')">Cancel</button>
+    <button class="modal-confirm" id="modal-clear-confirm2">Wipe Everything</button>
+  </div>
+</div></div>
+
+<!-- TOAST -->
+<div id="toast"><span class="t-icon" id="t-icon">✓</span><span id="t-msg"></span></div>
+
+<script type="module">
+// ─────────────────────────────────────────────
+//  IMPORTS
+// ─────────────────────────────────────────────
+import { SessionKit } from 'https://esm.sh/@wharfkit/session@1'
+import { WebRenderer } from 'https://esm.sh/@wharfkit/web-renderer@1'
+import { WalletPluginAnchor } from 'https://esm.sh/@wharfkit/wallet-plugin-anchor@1'
+import { WalletPluginCloudWallet } from 'https://esm.sh/@wharfkit/wallet-plugin-cloudwallet@1'
+
+// ─────────────────────────────────────────────
+//  CONFIG
+// ─────────────────────────────────────────────
+const WAX_CHAIN = {
+  id: '1064487b3cd1a897ce03ae5b6a865651747e2e152090f99c1d19d44e01aea5a4',
+  url: 'https://wax.greymass.com',
+}
+const WAX_API = 'https://wax.greymass.com'
+const KNOWN_TOKENS = [
+  { sym:'WAX', contract:'eosio.token', precision:8 },
+  { sym:'TLM', contract:'alien.worlds', precision:4 },
+  { sym:'BRWL', contract:'brawlertoken', precision:4 },
+  { sym:'TOCIUM', contract:'tociumsender', precision:4 },
+  { sym:'WOMBAT', contract:'wombattokens', precision:4 },
+  { sym:'SEST', contract:'karmatoken12', precision:4 },
+]
+
+// ─────────────────────────────────────────────
+//  SESSION KIT
+// ─────────────────────────────────────────────
+const webRenderer = new WebRenderer()
+const sessionKit = new SessionKit({
+  appName:'waxsend',
+  chains:[WAX_CHAIN],
+  ui:webRenderer,
+  walletPlugins:[new WalletPluginAnchor(), new WalletPluginCloudWallet()],
+})
+
+let SESSION = null
+let TOKENS  = []   // { sym, contract, precision, balance }
+
+// ─────────────────────────────────────────────
+//  LOCAL STORAGE HELPERS
+// ─────────────────────────────────────────────
+function lsGet(k){ try{ return JSON.parse(localStorage.getItem(k)) }catch(e){ return null } }
+function lsSet(k,v){ localStorage.setItem(k, JSON.stringify(v)) }
+
+function getContacts(){ return lsGet('waxsend_contacts') || [] }
+function saveContacts(arr){ lsSet('waxsend_contacts', arr) }
+
+function getSentHistory(){ return lsGet('waxsend_history') || {} }
+function recordSent(toWallet, amount, sym){
+  const h = getSentHistory()
+  const key = toWallet.toLowerCase()
+  if(!h[key]) h[key] = {}
+  if(!h[key][sym]) h[key][sym] = 0
+  h[key][sym] += parseFloat(amount) || 0
+  lsSet('waxsend_history', h)
+}
+function getSentTo(wallet){
+  const h = getSentHistory()
+  return h[wallet.toLowerCase()] || {}
+}
+
+// ─────────────────────────────────────────────
+//  TOAST
+// ─────────────────────────────────────────────
+function toast(msg, type='success'){
+  const el = document.getElementById('toast')
+  document.getElementById('t-icon').textContent = type==='success'?'✓':'✕'
+  document.getElementById('t-msg').textContent  = msg
+  el.className = `show ${type}`
+  clearTimeout(el._t)
+  el._t = setTimeout(()=>el.className='',4500)
+}
+
+// ─────────────────────────────────────────────
+//  NAV
+// ─────────────────────────────────────────────
+window.navTo = function(p){
+  document.querySelectorAll('.page').forEach(e=>e.classList.remove('active'))
+  document.querySelectorAll('#nav button').forEach(e=>e.classList.remove('active'))
+  document.getElementById('page-'+p).classList.add('active')
+  const nb = document.getElementById('nav-'+p)
+  if(nb) nb.classList.add('active')
+  if(p==='home') renderDashboard()
+  if(p==='send') renderSendPage()
+  if(p==='contacts') renderContactsPage()
+}
+
+// ─────────────────────────────────────────────
+//  AUTH
+// ─────────────────────────────────────────────
+async function login(wallet){
+  const st = document.getElementById('login-status')
+  st.textContent = 'Connecting…'
+  document.getElementById('btn-anchor').disabled = true
+  document.getElementById('btn-cloud').disabled  = true
+  try {
+    const r = await sessionKit.login({ walletPlugin: wallet })
+    SESSION = r.session
+    afterLogin()
+    toast(`Connected as ${String(SESSION.actor)}`)
+  } catch(e){
+    toast(e.message||'Login cancelled','error')
+    st.textContent = ''
+  } finally {
+    document.getElementById('btn-anchor').disabled = false
+    document.getElementById('btn-cloud').disabled  = false
+  }
+}
+
+function afterLogin(){
+  const actor = String(SESSION.actor)
+  document.getElementById('acct-name').textContent = actor
+  document.getElementById('acct-pill').classList.add('on')
+  document.getElementById('settings-acct').textContent = actor
+  document.getElementById('nav').classList.add('on')
+  navTo('home')
+  loadTokens()
+}
+
+async function logout(){
+  await sessionKit.logout().catch(()=>{})
+  SESSION = null
+  TOKENS  = []
+  document.getElementById('acct-pill').classList.remove('on')
+  document.getElementById('nav').classList.remove('on')
+  document.querySelectorAll('.page').forEach(e=>e.classList.remove('active'))
+  document.getElementById('page-login').classList.add('active')
+  toast('Disconnected','error')
+}
+
+document.getElementById('btn-anchor').addEventListener('click',()=>login('anchor'))
+document.getElementById('btn-cloud').addEventListener('click',()=>login('cloudwallet'))
+document.getElementById('disconnect-btn').addEventListener('click',logout)
+
+// Restore session
+;(async()=>{
+  try{
+    const r = await sessionKit.restore()
+    if(r){ SESSION = r; afterLogin() }
+  }catch(e){}
+})()
+
+// ─────────────────────────────────────────────
+//  TOKENS
+// ─────────────────────────────────────────────
+async function loadTokens(){
+  if(!SESSION) return
+  const actor = String(SESSION.actor)
+  document.getElementById('token-list').innerHTML = '<div class="token-loading">Loading balances…</div>'
+
+  const results = []
+  await Promise.all(KNOWN_TOKENS.map(async t=>{
+    try{
+      const r = await fetch(`${WAX_API}/v1/chain/get_currency_balance`,{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({code:t.contract,account:actor,symbol:t.sym})
+      })
+      const arr = await r.json()
+      if(arr && arr.length){
+        const bal = parseFloat(arr[0].split(' ')[0])
+        if(bal > 0) results.push({...t, balance:bal, balStr:arr[0]})
       }
+    }catch(e){}
+  }))
+
+  // Sort by balance descending
+  results.sort((a,b)=>b.balance - a.balance)
+  TOKENS = results
+  renderTokenList()
+  renderTokenPick()
+}
+
+function renderTokenList(filter=''){
+  const el = document.getElementById('token-list')
+  const list = filter ? TOKENS.filter(t=>t.sym.toLowerCase().includes(filter.toLowerCase())) : TOKENS
+  if(!list.length){
+    el.innerHTML = `<div class="empty"><div class="empty-icon">◈</div>${filter?'No matching tokens':'No token balances found'}</div>`
+    return
+  }
+  el.innerHTML = list.map(t=>`
+    <div class="token-row">
+      <div class="token-icon">${t.sym.slice(0,3)}</div>
+      <div class="token-info">
+        <div class="token-sym">${t.sym}</div>
+        <div class="token-contract">${t.contract}</div>
+      </div>
+      <div class="token-balance">${t.balStr}</div>
+    </div>`).join('')
+}
+
+document.getElementById('token-search').addEventListener('input',e=>renderTokenList(e.target.value))
+document.getElementById('refresh-tokens').addEventListener('click',loadTokens)
+
+// ─────────────────────────────────────────────
+//  CONTACTS HELPERS
+// ─────────────────────────────────────────────
+function avatarLetter(c){ return (c.name||c.discord||'?')[0].toUpperCase() }
+function renderContactCard(c, listEl, opts={}){
+  const sent  = getSentTo(c.wallet)
+  const sentHtml = Object.keys(sent).length
+    ? `<div class="sent-total">Sent: ${Object.entries(sent).map(([s,v])=>`<strong>${v.toFixed(4)} ${s}</strong>`).join(' · ')}</div>`
+    : ''
+  const div = document.createElement('div')
+  div.className = 'contact-card'
+  div.dataset.id = c.id
+  div.innerHTML = `
+    <div class="contact-head">
+      <div class="contact-avatar">${avatarLetter(c)}</div>
+      <div class="contact-main">
+        <div class="contact-name">${esc(c.name)}</div>
+        <div class="contact-wallet">${esc(c.wallet)}</div>
+      </div>
+      <span class="contact-chevron">▾</span>
+    </div>
+    <div class="contact-body">
+      ${c.discord?`<div class="cinfo-row"><span class="cinfo-lbl">Discord</span><span class="cinfo-val">${esc(c.discord)}</span></div>`:''}
+      ${c.discordId?`<div class="cinfo-row"><span class="cinfo-lbl">Discord ID</span><span class="cinfo-val">${esc(c.discordId)}</span></div>`:''}
+      ${c.desc?`<div class="cinfo-row"><span class="cinfo-lbl">Note</span><span class="cinfo-val">${esc(c.desc)}</span></div>`:''}
+      <div class="cinfo-row"><span class="cinfo-lbl">Wallet</span><span class="cinfo-val">${esc(c.wallet)}</span></div>
+      ${sentHtml}
+      <div class="c-actions">
+        ${opts.showSend!==false?`<button class="c-btn send-c" data-send="${esc(c.wallet)}">⚡ Send</button>`:''}
+        <button class="c-btn" data-edit="${c.id}">✎ Edit</button>
+        <button class="c-btn del" data-del="${c.id}">✕ Delete</button>
+      </div>
+    </div>`
+  div.querySelector('.contact-head').addEventListener('click',()=>{
+    div.classList.toggle('open')
+  })
+  div.querySelector('[data-edit]')?.addEventListener('click',e=>{
+    e.stopPropagation()
+    openEditContact(c.id)
+  })
+  div.querySelector('[data-del]')?.addEventListener('click',e=>{
+    e.stopPropagation()
+    confirmDelete(c.id, c.name)
+  })
+  div.querySelector('[data-send]')?.addEventListener('click',e=>{
+    e.stopPropagation()
+    navTo('send')
+    setTimeout(()=>preselectContact(c),100)
+  })
+  listEl.appendChild(div)
+}
+
+// ─────────────────────────────────────────────
+//  DASHBOARD CONTACTS
+// ─────────────────────────────────────────────
+function renderDashboard(){
+  renderContactListHome()
+  renderTokenList()
+}
+
+function renderContactListHome(filter=''){
+  const el = document.getElementById('contact-list-home')
+  el.innerHTML=''
+  const contacts = getContacts().filter(c=>!filter||
+    c.name.toLowerCase().includes(filter)||c.wallet.toLowerCase().includes(filter)||
+    (c.discord||'').toLowerCase().includes(filter))
+  if(!contacts.length){
+    el.innerHTML=`<div class="empty"><div class="empty-icon">◉</div>${filter?'No matches':'No contacts yet — add one!'}</div>`
+    return
+  }
+  contacts.forEach(c=>renderContactCard(c, el, {showSend:true}))
+}
+
+document.getElementById('contact-search-home').addEventListener('input',e=>{
+  renderContactListHome(e.target.value.toLowerCase())
+})
+document.getElementById('goto-new-contact').addEventListener('click',()=>{
+  navTo('contacts'); setTimeout(()=>showContactTab('new'),50)
+})
+
+// ─────────────────────────────────────────────
+//  CONTACTS PAGE
+// ─────────────────────────────────────────────
+function renderContactsPage(filter=''){
+  const el = document.getElementById('contact-list-page')
+  el.innerHTML=''
+  const contacts = getContacts().filter(c=>!filter||
+    c.name.toLowerCase().includes(filter)||c.wallet.toLowerCase().includes(filter)||
+    (c.discord||'').toLowerCase().includes(filter))
+  if(!contacts.length){
+    el.innerHTML=`<div class="empty"><div class="empty-icon">◉</div>${filter?'No matches':'No contacts yet'}</div>`
+    return
+  }
+  contacts.forEach(c=>renderContactCard(c, el, {showSend:true}))
+}
+document.getElementById('contact-search-page').addEventListener('input',e=>renderContactsPage(e.target.value.toLowerCase()))
+
+window.showContactTab = function(tab){
+  const listWrap = document.getElementById('contact-list-wrap')
+  const formWrap = document.getElementById('contact-form-wrap')
+  document.getElementById('tab-list').classList.toggle('active', tab==='list')
+  document.getElementById('tab-new').classList.toggle('active',  tab==='new')
+  if(tab==='list'){
+    listWrap.classList.remove('hidden')
+    formWrap.classList.remove('visible')
+    renderContactsPage()
+    // reset form
+    document.getElementById('edit-id').value=''
+    document.getElementById('cf-name').value=''
+    document.getElementById('cf-wallet').value=''
+    document.getElementById('cf-discord').value=''
+    document.getElementById('cf-discord-id').value=''
+    document.getElementById('cf-desc').value=''
+    document.getElementById('form-title').textContent='New Contact'
+  } else {
+    listWrap.classList.add('hidden')
+    formWrap.classList.add('visible')
+  }
+}
+
+function openEditContact(id){
+  const c = getContacts().find(x=>x.id===id)
+  if(!c) return
+  navTo('contacts')
+  showContactTab('new')
+  document.getElementById('form-title').textContent = 'Edit Contact'
+  document.getElementById('edit-id').value   = c.id
+  document.getElementById('cf-name').value   = c.name
+  document.getElementById('cf-wallet').value = c.wallet
+  document.getElementById('cf-discord').value    = c.discord   || ''
+  document.getElementById('cf-discord-id').value = c.discordId || ''
+  document.getElementById('cf-desc').value   = c.desc || ''
+}
+
+window.saveContact = function(){
+  const name   = document.getElementById('cf-name').value.trim()
+  const wallet = document.getElementById('cf-wallet').value.trim().toLowerCase()
+  if(!name)  return toast('Name is required','error')
+  if(!wallet) return toast('WAX wallet is required','error')
+  const contacts = getContacts()
+  const editId = document.getElementById('edit-id').value
+  if(editId){
+    const idx = contacts.findIndex(c=>c.id===editId)
+    if(idx>-1){
+      contacts[idx] = {...contacts[idx], name, wallet,
+        discord:document.getElementById('cf-discord').value.trim(),
+        discordId:document.getElementById('cf-discord-id').value.trim(),
+        desc:document.getElementById('cf-desc').value.trim()}
+      saveContacts(contacts)
+      toast('Contact updated')
     }
-
-    btnAnchor.addEventListener('click', () => login('anchor'))
-    btnCloud.addEventListener('click',  () => login('cloudwallet'))
-
-    // ── Logout ──────────────────────────────────────────────────────────
-    logoutBtn.addEventListener('click', async () => {
-      await sessionKit.logout()
-      setLoggedOut()
-      showToast('Disconnected', 'error')
+  } else {
+    contacts.push({
+      id: Date.now().toString(36)+Math.random().toString(36).slice(2,6),
+      name, wallet,
+      discord:document.getElementById('cf-discord').value.trim(),
+      discordId:document.getElementById('cf-discord-id').value.trim(),
+      desc:document.getElementById('cf-desc').value.trim(),
+      created: Date.now()
     })
+    saveContacts(contacts)
+    toast('Contact saved')
+  }
+  showContactTab('list')
+  renderContactListHome()
+}
 
-    // ── Send transaction ────────────────────────────────────────────────
-    sendBtn.addEventListener('click', async () => {
-      if (!session) return
+// Delete with double confirm
+let pendingDeleteId = null
+function confirmDelete(id, name){
+  pendingDeleteId = id
+  document.getElementById('modal-del-msg').textContent =
+    `Delete "${name}"? This cannot be undone.`
+  openModal('modal-delete')
+}
+document.getElementById('modal-del-confirm').addEventListener('click',()=>{
+  if(!pendingDeleteId) return
+  const contacts = getContacts().filter(c=>c.id!==pendingDeleteId)
+  saveContacts(contacts)
+  pendingDeleteId = null
+  closeModal('modal-delete')
+  toast('Contact deleted')
+  renderContactsPage()
+  renderContactListHome()
+})
 
-      const to     = document.getElementById('to-address').value.trim()
-      const amount = parseFloat(document.getElementById('amount').value)
-      const memo   = document.getElementById('memo').value.trim()
+// ─────────────────────────────────────────────
+//  SEND PAGE
+// ─────────────────────────────────────────────
+let selectedContact = null
+let selectedToken   = null
 
-      // Validate
-      if (!to) return showToast('Enter a recipient address', 'error')
-      if (!amount || amount <= 0) return showToast('Enter a valid amount', 'error')
+function renderSendPage(){
+  renderContactPick()
+  renderTokenPick()
+}
 
-      // Format quantity: WAX uses 8 decimal places
-      const quantity = `${amount.toFixed(8)} WAX`
-
-      sendBtn.classList.add('loading')
-      sendBtn.disabled = true
-      txResult.style.display = 'none'
-
-      try {
-        const action = {
-          account: 'eosio.token',
-          name: 'transfer',
-          authorization: [session.permissionLevel],
-          data: {
-            from: session.actor,
-            to: to,
-            quantity: quantity,
-            memo: memo,
-          },
-        }
-
-        const result = await session.transact({ action })
-        const txId = result.response?.transaction_id || result.resolved?.transaction?.id || '(tx id unavailable)'
-
-        txResult.innerHTML = `
-          ✓ Transaction sent!<br>
-          <span style="opacity:0.6">TX ID:</span> 
-          <a href="https://waxblock.io/transaction/${txId}" target="_blank" rel="noopener">${txId}</a>
-        `
-        txResult.style.display = 'block'
-        showToast(`Sent ${quantity} to ${to}`)
-
-        // Clear form
-        document.getElementById('to-address').value = ''
-        document.getElementById('amount').value = ''
-        document.getElementById('memo').value = ''
-      } catch(e) {
-        console.error(e)
-        showToast(e.message || 'Transaction failed', 'error')
-      } finally {
-        sendBtn.classList.remove('loading')
-        sendBtn.disabled = false
+function renderContactPick(filter=''){
+  const el = document.getElementById('contact-pick')
+  const contacts = getContacts()
+  if(!contacts.length){
+    el.innerHTML='<div style="font-size:12px;color:var(--muted);font-family:\'Space Mono\',monospace;padding:4px 0;">No contacts yet</div>'
+    return
+  }
+  el.innerHTML = contacts.map(c=>`
+    <div class="cpick${selectedContact?.id===c.id?' sel':''}" data-id="${c.id}">
+      <div class="cpick-name">${esc(c.name)}</div>
+      <div class="cpick-wallet">${esc(c.wallet)}</div>
+    </div>`).join('')
+  el.querySelectorAll('.cpick').forEach(el=>{
+    el.addEventListener('click',()=>{
+      const c = getContacts().find(x=>x.id===el.dataset.id)
+      if(!c) return
+      if(selectedContact?.id===c.id){
+        selectedContact=null
+        document.getElementById('send-to').value=''
+      } else {
+        selectedContact=c
+        document.getElementById('send-to').value=c.wallet
       }
+      renderContactPick()
     })
-  </script>
+  })
+}
+
+function renderTokenPick(){
+  const el = document.getElementById('token-pick')
+  if(!TOKENS.length){ el.innerHTML='<div style="font-size:11px;color:var(--muted);font-family:\'Space Mono\',monospace;">Load tokens first</div>'; return }
+  el.innerHTML = TOKENS.map(t=>`
+    <div class="tsym${selectedToken?.sym===t.sym?' sel':''}" data-sym="${t.sym}" data-contract="${t.contract}" data-prec="${t.precision}">
+      ${t.sym}
+    </div>`).join('')
+  el.querySelectorAll('.tsym').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      selectedToken={sym:btn.dataset.sym, contract:btn.dataset.contract, precision:parseInt(btn.dataset.prec)}
+      document.getElementById('send-sym-label').textContent = selectedToken.sym
+      renderTokenPick()
+    })
+  })
+}
+
+function preselectContact(c){
+  selectedContact = c
+  document.getElementById('send-to').value = c.wallet
+  renderContactPick()
+}
+
+document.getElementById('do-send').addEventListener('click', async()=>{
+  if(!SESSION) return toast('Not connected','error')
+  const to     = document.getElementById('send-to').value.trim()
+  const amount = parseFloat(document.getElementById('send-amount').value)
+  const memo   = document.getElementById('send-memo').value.trim()
+  if(!to)            return toast('Enter recipient address','error')
+  if(!selectedToken) return toast('Select a token','error')
+  if(!amount || amount<=0) return toast('Enter a valid amount','error')
+
+  const quantity = `${amount.toFixed(selectedToken.precision)} ${selectedToken.sym}`
+  const btn = document.getElementById('do-send')
+  btn.classList.add('loading'); btn.disabled=true
+  document.getElementById('tx-result').style.display='none'
+
+  try{
+    const action = {
+      account: selectedToken.contract,
+      name:'transfer',
+      authorization:[SESSION.permissionLevel],
+      data:{ from:SESSION.actor, to, quantity, memo }
+    }
+    const result = await SESSION.transact({action})
+    const txId = result.response?.transaction_id
+      || result.resolved?.transaction?.id
+      || '(pending)'
+
+    recordSent(to, amount, selectedToken.sym)
+
+    const txEl = document.getElementById('tx-result')
+    txEl.innerHTML = `✓ Sent ${quantity} to ${esc(to)}<br>
+      <span style="opacity:.6">TX:</span> <a href="https://waxblock.io/transaction/${txId}" target="_blank">${txId}</a>`
+    txEl.style.display='block'
+    toast(`Sent ${quantity} to ${to}`)
+
+    // Clear form
+    document.getElementById('send-to').value=''
+    document.getElementById('send-amount').value=''
+    document.getElementById('send-memo').value=''
+    selectedContact=null
+    renderContactPick()
+    renderContactListHome()  // refresh sent totals
+  }catch(e){
+    toast(e.message||'Transaction failed','error')
+  }finally{
+    btn.classList.remove('loading'); btn.disabled=false
+  }
+})
+
+// ─────────────────────────────────────────────
+//  SETTINGS
+// ─────────────────────────────────────────────
+document.getElementById('clear-data-btn').addEventListener('click',()=>openModal('modal-clear'))
+document.getElementById('modal-clear-confirm1').addEventListener('click',()=>{
+  closeModal('modal-clear')
+  setTimeout(()=>openModal('modal-clear2'),200)
+})
+document.getElementById('modal-clear-confirm2').addEventListener('click',()=>{
+  localStorage.removeItem('waxsend_contacts')
+  localStorage.removeItem('waxsend_history')
+  closeModal('modal-clear2')
+  toast('All local data cleared')
+  renderContactListHome()
+  renderContactsPage()
+})
+
+// ─────────────────────────────────────────────
+//  MODAL HELPERS
+// ─────────────────────────────────────────────
+window.openModal  = id=>document.getElementById(id).classList.add('open')
+window.closeModal = id=>document.getElementById(id).classList.remove('open')
+document.querySelectorAll('.overlay').forEach(ov=>{
+  ov.addEventListener('click',e=>{ if(e.target===ov) ov.classList.remove('open') })
+})
+
+// ─────────────────────────────────────────────
+//  UTIL
+// ─────────────────────────────────────────────
+function esc(s){ return String(s||'').replace(/[<>&"']/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c])) }
+
+// expose for HTML onclick
+window.saveContact = window.saveContact || (()=>{})
+</script>
 </body>
 </html>
