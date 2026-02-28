@@ -571,28 +571,16 @@ const WAX_CHAIN = {
   url: WAX_RPC,
 }
 
-// Comprehensive list of WAX tokens to check
-const KNOWN_TOKENS = [
-  { sym:'WAX',     contract:'eosio.token',     precision:8 },
-  { sym:'TLM',     contract:'alien.worlds',     precision:4 },
-  { sym:'BRWL',    contract:'brawlertoken',     precision:4 },
-  { sym:'TOCIUM',  contract:'tociumsender',     precision:4 },
-  { sym:'WOMBAT',  contract:'wombattokens',     precision:4 },
-  { sym:'SEST',    contract:'karmatoken12',     precision:4 },
-  { sym:'KENN',    contract:'kennbotoken1',     precision:4 },
-  { sym:'DUST',    contract:'thedust4play',     precision:8 },
-  { sym:'TACO',    contract:'tacostokens1',     precision:8 },
-  { sym:'TELOS',   contract:'eosio.token',      precision:4 },
-  { sym:'NEFTY',   contract:'neftypunksio',     precision:8 },
-  { sym:'CRUX',    contract:'cruxtoken111',     precision:8 },
-  { sym:'XPS',     contract:'xpspacetoken',     precision:8 },
-  { sym:'SCHWIFT', contract:'schwiftybase',     precision:8 },
-  { sym:'CAIT',    contract:'caittoken111',     precision:4 },
-  { sym:'CHIPS',   contract:'chipscontrac',     precision:4 },
-  { sym:'OG',      contract:'ogxogtokenss',     precision:8 },
-  { sym:'BLUX',    contract:'bluxtoken111',     precision:8 },
-  { sym:'LSWAX',   contract:'liquidstakin',     precision:8 },
-  { sym:'RWAX',    contract:'rwaxotctoken',     precision:8 },
+// Hyperion endpoints to try in order (for get_tokens discovery)
+const HYPERION_NODES = [
+  'https://wax.eosphere.io',
+  'https://api.waxsweden.org',
+  'https://hyperion.wax.eosrio.io',
+  'https://wax.cryptolions.io',
+]
+// Fallback: a minimal seed list used only if ALL Hyperion nodes fail
+const FALLBACK_TOKENS = [
+  { sym:'WAX', contract:'eosio.token', precision:8 },
 ]
 
 // ─── SESSION KIT ──────────────────────────────────────────────────────────────
@@ -765,37 +753,70 @@ document.getElementById('disconnect-btn').addEventListener('click', logout)
   }catch{}
 })()
 
-// ─── LOAD TOKENS ──────────────────────────────────────────────────────────────
+// ─── LOAD TOKENS via Hyperion get_tokens ──────────────────────────────────────
+// This endpoint returns EVERY token the account holds — no hardcoded list needed.
+// It's provided by Hyperion full-history nodes on WAX.
 async function loadTokens(){
   if(!SESSION) return
   const actor = String(SESSION.actor)
-  document.getElementById('token-list').innerHTML = '<div class="token-loading">⟳ Fetching balances…</div>'
+  const listEl = document.getElementById('token-list')
+  listEl.innerHTML = '<div class="token-loading">⟳ Discovering all tokens…</div>'
 
-  // Also try get_account for RAM/NET/CPU and main WAX balance
-  const results=[]
+  let raw = null
 
-  // Fetch all known token balances in parallel
-  const fetches = KNOWN_TOKENS.map(async t=>{
+  // Try each Hyperion node until one responds with valid token data
+  for(const node of HYPERION_NODES){
     try{
-      const r = await fetch(`${WAX_RPC}/v1/chain/get_currency_balance`,{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({ code:t.contract, account:actor, symbol:t.sym })
+      const r = await fetch(`${node}/v2/state/get_tokens?account=${actor}`, {
+        signal: AbortSignal.timeout(7000)
       })
-      const arr = await r.json()
-      if(Array.isArray(arr) && arr.length){
-        const raw = arr[0]
-        const bal = parseFloat(raw.split(' ')[0])
-        if(bal > 0) results.push({...t, balance:bal, balStr:raw})
+      if(!r.ok) continue
+      const data = await r.json()
+      if(data && Array.isArray(data.tokens) && data.tokens.length > 0){
+        raw = data.tokens
+        break
       }
-    }catch{}
+    }catch{ /* try next node */ }
+  }
+
+  let results = []
+
+  if(raw){
+    // Hyperion returns: { symbol, precision, amount, contract }
+    results = raw
+      .filter(t => (t.amount||0) > 0)
+      .map(t => {
+        const precision = t.precision ?? 8
+        const balance   = parseFloat(t.amount) || 0
+        const balStr    = `${balance.toFixed(precision)} ${t.symbol}`
+        return { sym:t.symbol, contract:t.contract, precision, balance, balStr }
+      })
+  } else {
+    // All Hyperion nodes failed — fall back to fetching WAX balance directly
+    listEl.innerHTML = '<div class="token-loading">⟳ Hyperion unavailable, fetching WAX…</div>'
+    for(const t of FALLBACK_TOKENS){
+      try{
+        const r   = await fetch(`${WAX_RPC}/v1/chain/get_currency_balance`,{
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({ code:t.contract, account:actor, symbol:t.sym })
+        })
+        const arr = await r.json()
+        if(Array.isArray(arr) && arr.length){
+          const balStr = arr[0]
+          const balance = parseFloat(balStr.split(' ')[0])
+          if(balance > 0) results.push({...t, balance, balStr})
+        }
+      }catch{}
+    }
+  }
+
+  // Sort: WAX always first, then by balance descending
+  results.sort((a,b)=>{
+    if(a.sym === 'WAX') return -1
+    if(b.sym === 'WAX') return  1
+    return b.balance - a.balance
   })
 
-  // Also try to discover extra tokens via get_currency_balances / dfuse-style
-  // We do a broader scan using get_table_rows on eosio.token
-  await Promise.all(fetches)
-
-  results.sort((a,b)=>b.balance-a.balance)
   TOKENS = results
   renderTokenListHome()
   renderTokenDp()
