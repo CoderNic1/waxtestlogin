@@ -2,85 +2,731 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>WAX + Alcor Login Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WAX Transfer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet" />
   <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #111118;
+      --card: #16161f;
+      --border: #252530;
+      --accent: #f5a623;
+      --accent2: #ff6b35;
+      --green: #00e676;
+      --red: #ff1744;
+      --text: #e8e8f0;
+      --muted: #6b6b80;
+      --glow: rgba(245, 166, 35, 0.15);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
-      font-family: Arial, sans-serif;
-      background: #121212;
-      color: #f0f0f0;
+      font-family: 'Syne', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding-top: 60px;
+      overflow-x: hidden;
     }
-    button {
-      padding: 12px 20px;
+
+    /* Background grain + grid */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(245,166,35,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(245,166,35,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Ambient glow blobs */
+    .blob {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .blob-1 {
+      width: 400px; height: 400px;
+      background: rgba(245, 166, 35, 0.06);
+      top: -100px; right: -100px;
+    }
+    .blob-2 {
+      width: 300px; height: 300px;
+      background: rgba(255, 107, 53, 0.05);
+      bottom: 100px; left: -80px;
+    }
+
+    /* Header */
+    header {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 520px;
+      padding: 40px 24px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .logo-icon {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
       font-size: 16px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      background: #ffcc00;
+      font-weight: 800;
       color: #000;
-      font-weight: bold;
     }
-    #status {
-      margin-top: 20px;
+    .logo-text {
       font-size: 18px;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Session pill */
+    #session-pill {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 6px 14px 6px 8px;
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+    }
+    #session-pill.visible { display: flex; }
+    .dot {
+      width: 7px; height: 7px;
+      background: var(--green);
+      border-radius: 50%;
+      box-shadow: 0 0 6px var(--green);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* Main card */
+    main {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 520px;
+      padding: 24px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.03), 0 40px 80px rgba(0,0,0,0.4);
+    }
+
+    /* Login panel */
+    #login-panel {
+      padding: 48px 40px;
+      text-align: center;
+    }
+    .panel-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      color: var(--accent);
+      text-transform: uppercase;
+      background: rgba(245,166,35,0.08);
+      border: 1px solid rgba(245,166,35,0.2);
+      border-radius: 100px;
+      padding: 4px 12px;
+      margin-bottom: 24px;
+    }
+    h1 {
+      font-size: 32px;
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 12px;
+    }
+    h1 span {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .subtitle {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.6;
+      margin-bottom: 36px;
+    }
+
+    /* Wallet options */
+    .wallet-options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .wallet-btn {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: left;
+      width: 100%;
+      color: var(--text);
+      font-family: 'Syne', sans-serif;
+    }
+    .wallet-btn:hover {
+      border-color: var(--accent);
+      background: rgba(245,166,35,0.04);
+      transform: translateY(-1px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3), 0 0 0 1px rgba(245,166,35,0.1);
+    }
+    .wallet-btn:active { transform: translateY(0); }
+    .wallet-icon {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .wallet-icon.anchor { background: rgba(83,126,255,0.15); }
+    .wallet-icon.cloud  { background: rgba(245,166,35,0.15); }
+    .wallet-info { flex: 1; }
+    .wallet-name {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+    .wallet-desc {
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .wallet-arrow {
+      color: var(--muted);
+      font-size: 18px;
+      transition: transform 0.2s;
+    }
+    .wallet-btn:hover .wallet-arrow { transform: translateX(3px); color: var(--accent); }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 8px 0;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+    .divider span {
+      font-size: 11px;
+      color: var(--muted);
+      font-family: 'Space Mono', monospace;
+    }
+
+    /* Transfer panel */
+    #transfer-panel { display: none; }
+    #transfer-panel.visible { display: block; }
+
+    .panel-header {
+      padding: 24px 28px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .panel-title {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .account-tag {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      color: var(--accent);
+      background: rgba(245,166,35,0.08);
+      padding: 4px 10px;
+      border-radius: 100px;
+    }
+
+    .form-body {
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    input {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      color: var(--text);
+      font-family: 'Space Mono', monospace;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      width: 100%;
+    }
+    input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(245,166,35,0.1);
+    }
+    input::placeholder { color: var(--muted); }
+
+    /* Amount field with WAX suffix */
+    .amount-wrap {
+      position: relative;
+    }
+    .amount-wrap input { padding-right: 58px; }
+    .amount-suffix {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    /* Send button */
+    .send-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 16px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border: none;
+      border-radius: 14px;
+      color: #000;
+      font-family: 'Syne', sans-serif;
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: all 0.2s;
+      width: 100%;
+      margin-top: 4px;
+    }
+    .send-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(245,166,35,0.3);
+    }
+    .send-btn:active { transform: translateY(0); }
+    .send-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* Logout */
+    .logout-row {
+      padding: 16px 28px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: flex-end;
+    }
+    .logout-btn {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 7px 14px;
+      color: var(--muted);
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .logout-btn:hover { border-color: var(--red); color: var(--red); }
+
+    /* Toast */
+    #toast {
+      position: fixed;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 20px;
+      font-size: 13px;
+      font-family: 'Space Mono', monospace;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 100;
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      white-space: nowrap;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      max-width: 90vw;
+      white-space: normal;
+      word-break: break-all;
+    }
+    #toast.show { transform: translateX(-50%) translateY(0); }
+    #toast.success { border-color: rgba(0,230,118,0.3); }
+    #toast.error   { border-color: rgba(255,23,68,0.3); }
+    .toast-icon { font-size: 16px; flex-shrink: 0; }
+
+    /* Loading spinner */
+    .spinner {
+      width: 16px; height: 16px;
+      border: 2px solid rgba(0,0,0,0.3);
+      border-top-color: #000;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .send-btn.loading .spinner { display: block; }
+    .send-btn.loading .btn-text { display: none; }
+
+    /* Tx success box */
+    #tx-result {
+      display: none;
+      margin: 0 28px 20px;
+      padding: 14px 16px;
+      background: rgba(0,230,118,0.06);
+      border: 1px solid rgba(0,230,118,0.2);
+      border-radius: 12px;
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      color: var(--green);
+      word-break: break-all;
+      line-height: 1.6;
+    }
+    #tx-result a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    #tx-result a:hover { text-decoration: underline; }
+
+    /* Login loading state */
+    #login-status {
+      font-size: 13px;
+      color: var(--muted);
+      text-align: center;
+      min-height: 20px;
+      font-family: 'Space Mono', monospace;
     }
   </style>
 </head>
-
 <body>
-  <h1>WAX + Alcor Login Demo</h1>
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
 
-  <button onclick="login()">Login with WAX / Alcor</button>
+  <header>
+    <div class="logo">
+      <div class="logo-icon">W</div>
+      <div class="logo-text">WAXSEND</div>
+    </div>
+    <div id="session-pill">
+      <div class="dot"></div>
+      <span id="session-account">...</span>
+    </div>
+  </header>
 
-  <div id="status">Not logged in</div>
+  <main>
+    <div class="card">
+      <!-- LOGIN PANEL -->
+      <div id="login-panel">
+        <div class="panel-badge">⬡ WAX Blockchain</div>
+        <h1>Connect your<br><span>WAX Wallet</span></h1>
+        <p class="subtitle">Send WAXP tokens securely.<br>Your keys never leave your wallet.</p>
+
+        <div class="wallet-options">
+          <button class="wallet-btn" id="btn-anchor">
+            <div class="wallet-icon anchor">⚓</div>
+            <div class="wallet-info">
+              <div class="wallet-name">Anchor Wallet</div>
+              <div class="wallet-desc">Desktop & mobile EOSIO wallet</div>
+            </div>
+            <div class="wallet-arrow">→</div>
+          </button>
+
+          <div class="divider"><span>or</span></div>
+
+          <button class="wallet-btn" id="btn-cloud">
+            <div class="wallet-icon cloud">☁️</div>
+            <div class="wallet-info">
+              <div class="wallet-name">MyCloudWallet</div>
+              <div class="wallet-desc">Web-based WAX wallet</div>
+            </div>
+            <div class="wallet-arrow">→</div>
+          </button>
+        </div>
+
+        <div id="login-status"></div>
+      </div>
+
+      <!-- TRANSFER PANEL -->
+      <div id="transfer-panel">
+        <div class="panel-header">
+          <div class="panel-title">Send WAXP</div>
+          <div class="account-tag">
+            <span>◉</span>
+            <span id="logged-account">—</span>
+          </div>
+        </div>
+
+        <div class="form-body">
+          <div class="field">
+            <label>Recipient Address</label>
+            <input type="text" id="to-address" placeholder="accountname.wam" autocomplete="off" spellcheck="false" />
+          </div>
+
+          <div class="field">
+            <label>Amount</label>
+            <div class="amount-wrap">
+              <input type="number" id="amount" placeholder="0.00000000" min="0.00000001" step="0.00000001" />
+              <div class="amount-suffix">WAXP</div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Memo <span style="color:var(--muted);font-weight:400;text-transform:none">(optional)</span></label>
+            <input type="text" id="memo" placeholder="Add a note..." maxlength="256" />
+          </div>
+
+          <button class="send-btn" id="send-btn">
+            <div class="spinner"></div>
+            <span class="btn-text">⚡ Sign &amp; Send Transaction</span>
+          </button>
+        </div>
+
+        <div id="tx-result"></div>
+
+        <div class="logout-row">
+          <button class="logout-btn" id="logout-btn">Disconnect →</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Toast -->
+  <div id="toast">
+    <span class="toast-icon" id="toast-icon">✓</span>
+    <span id="toast-msg">Message</span>
+  </div>
 
   <script type="module">
-    import {
-      SessionKit,
-      WalletPluginCloudWallet,
-      WalletPluginAnchor
-    } from "https://cdn.jsdelivr.net/npm/@wharfkit/session";
+    // ── Imports via esm.sh ──────────────────────────────────────────────
+    import { SessionKit } from 'https://esm.sh/@wharfkit/session@1'
+    import { WebRenderer } from 'https://esm.sh/@wharfkit/web-renderer@1'
+    import { WalletPluginAnchor } from 'https://esm.sh/@wharfkit/wallet-plugin-anchor@1'
+    import { WalletPluginCloudWallet } from 'https://esm.sh/@wharfkit/wallet-plugin-cloudwallet@1'
 
-    // WAX mainnet chain info
-    const chain = {
-      id: "1064487b3cd1a897ce03ae5b6a865651747e2e0b2f3f1b4f1c0f8f07f0f88f0f",
-      url: "https://wax.greymass.com"
-    };
+    // ── WAX Mainnet config ──────────────────────────────────────────────
+    const WAX_CHAIN = {
+      id: '1064487b3cd1a897ce03ae5b6a865651747e2e152090f99c1d19d44e01aea5a4',
+      url: 'https://wax.greymass.com',
+    }
 
-    // Wallet plugins: WAX Cloud Wallet + Anchor (Alcor-compatible)
-    const walletPlugins = [
-      new WalletPluginCloudWallet(),
-      new WalletPluginAnchor()
-    ];
+    // ── Init WharfKit ───────────────────────────────────────────────────
+    const webRenderer = new WebRenderer()
 
-    // Create the session kit
     const sessionKit = new SessionKit({
-      appName: "WAX Login Demo",
-      chains: [chain],
-      walletPlugins
-    });
+      appName: 'waxsend',
+      chains: [WAX_CHAIN],
+      ui: webRenderer,
+      walletPlugins: [
+        new WalletPluginAnchor(),
+        new WalletPluginCloudWallet(),
+      ],
+    })
 
-    // Login function
-    async function login() {
+    // ── State ───────────────────────────────────────────────────────────
+    let session = null
+
+    // ── DOM refs ────────────────────────────────────────────────────────
+    const loginPanel    = document.getElementById('login-panel')
+    const transferPanel = document.getElementById('transfer-panel')
+    const sessionPill   = document.getElementById('session-pill')
+    const sessionAccount= document.getElementById('session-account')
+    const loggedAccount = document.getElementById('logged-account')
+    const btnAnchor     = document.getElementById('btn-anchor')
+    const btnCloud      = document.getElementById('btn-cloud')
+    const sendBtn       = document.getElementById('send-btn')
+    const logoutBtn     = document.getElementById('logout-btn')
+    const txResult      = document.getElementById('tx-result')
+    const loginStatus   = document.getElementById('login-status')
+
+    // ── Helpers ─────────────────────────────────────────────────────────
+    function showToast(msg, type = 'success') {
+      const toast  = document.getElementById('toast')
+      const icon   = document.getElementById('toast-icon')
+      const msgEl  = document.getElementById('toast-msg')
+      icon.textContent = type === 'success' ? '✓' : '✕'
+      msgEl.textContent = msg
+      toast.className = `show ${type}`
+      clearTimeout(toast._timer)
+      toast._timer = setTimeout(() => toast.className = '', 5000)
+    }
+
+    function setLoggedIn(s) {
+      session = s
+      const actor = String(s.actor)
+      loggedAccount.textContent = actor
+      sessionAccount.textContent = actor
+      sessionPill.classList.add('visible')
+      loginPanel.style.display = 'none'
+      transferPanel.classList.add('visible')
+      txResult.style.display = 'none'
+    }
+
+    function setLoggedOut() {
+      session = null
+      sessionPill.classList.remove('visible')
+      loginPanel.style.display = 'block'
+      transferPanel.classList.remove('visible')
+      txResult.style.display = 'none'
+      loginStatus.textContent = ''
+    }
+
+    // ── Restore session on load ─────────────────────────────────────────
+    try {
+      const restored = await sessionKit.restore()
+      if (restored) setLoggedIn(restored)
+    } catch(e) {
+      console.warn('Restore failed:', e)
+    }
+
+    // ── Login with a specific wallet ────────────────────────────────────
+    async function login(walletPlugin) {
+      loginStatus.textContent = 'Connecting…'
+      btnAnchor.disabled = true
+      btnCloud.disabled  = true
       try {
-        const session = await sessionKit.login();
-
-        document.getElementById("status").innerText =
-          "✅ Logged in as: " + session.actor.toString();
-
-        console.log("Session:", session);
-      } catch (err) {
-        console.error("Login error:", err);
-        document.getElementById("status").innerText =
-          "❌ Login failed or cancelled";
+        const result = await sessionKit.login({ walletPlugin })
+        setLoggedIn(result.session)
+        showToast(`Connected as ${String(result.session.actor)}`)
+      } catch(e) {
+        console.error(e)
+        showToast(e.message || 'Login cancelled', 'error')
+        loginStatus.textContent = ''
+      } finally {
+        btnAnchor.disabled = false
+        btnCloud.disabled  = false
       }
     }
 
-    // Expose login globally for button onclick
-    window.login = login;
+    btnAnchor.addEventListener('click', () => login('anchor'))
+    btnCloud.addEventListener('click',  () => login('cloudwallet'))
+
+    // ── Logout ──────────────────────────────────────────────────────────
+    logoutBtn.addEventListener('click', async () => {
+      await sessionKit.logout()
+      setLoggedOut()
+      showToast('Disconnected', 'error')
+    })
+
+    // ── Send transaction ────────────────────────────────────────────────
+    sendBtn.addEventListener('click', async () => {
+      if (!session) return
+
+      const to     = document.getElementById('to-address').value.trim()
+      const amount = parseFloat(document.getElementById('amount').value)
+      const memo   = document.getElementById('memo').value.trim()
+
+      // Validate
+      if (!to) return showToast('Enter a recipient address', 'error')
+      if (!amount || amount <= 0) return showToast('Enter a valid amount', 'error')
+
+      // Format quantity: WAX uses 8 decimal places
+      const quantity = `${amount.toFixed(8)} WAX`
+
+      sendBtn.classList.add('loading')
+      sendBtn.disabled = true
+      txResult.style.display = 'none'
+
+      try {
+        const action = {
+          account: 'eosio.token',
+          name: 'transfer',
+          authorization: [session.permissionLevel],
+          data: {
+            from: session.actor,
+            to: to,
+            quantity: quantity,
+            memo: memo,
+          },
+        }
+
+        const result = await session.transact({ action })
+        const txId = result.response?.transaction_id || result.resolved?.transaction?.id || '(tx id unavailable)'
+
+        txResult.innerHTML = `
+          ✓ Transaction sent!<br>
+          <span style="opacity:0.6">TX ID:</span> 
+          <a href="https://waxblock.io/transaction/${txId}" target="_blank" rel="noopener">${txId}</a>
+        `
+        txResult.style.display = 'block'
+        showToast(`Sent ${quantity} to ${to}`)
+
+        // Clear form
+        document.getElementById('to-address').value = ''
+        document.getElementById('amount').value = ''
+        document.getElementById('memo').value = ''
+      } catch(e) {
+        console.error(e)
+        showToast(e.message || 'Transaction failed', 'error')
+      } finally {
+        sendBtn.classList.remove('loading')
+        sendBtn.disabled = false
+      }
+    })
   </script>
 </body>
 </html>
