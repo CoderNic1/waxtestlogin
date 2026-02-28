@@ -5,80 +5,73 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>WAXSEND — WAX Wallet</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet"/>
 <style>
 :root{
   --bg:#080b10;--s1:#0d1117;--s2:#111820;--card:#141c25;--border:#1e2d3d;
   --accent:#f7b731;--a2:#ff6b35;--a3:#00e5ff;
   --green:#39ff87;--red:#ff3a5c;--muted:#4a6280;--text:#d6e8f7;--text2:#8aafc7;
-  --r:14px;--shadow:0 8px 32px rgba(0,0,0,.5);
+  --r:14px;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;overflow:hidden;}
 body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column;}
-
-/* ── Scrollbar ── */
 ::-webkit-scrollbar{width:4px;height:4px;}
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
 
-/* ── Background grid ── */
+/* grid bg */
 body::before{content:'';position:fixed;inset:0;
-  background-image:linear-gradient(rgba(0,229,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,.025) 1px,transparent 1px);
+  background-image:linear-gradient(rgba(0,229,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,.02) 1px,transparent 1px);
   background-size:48px 48px;pointer-events:none;z-index:0;}
 
-/* ── Blob ── */
+/* blobs */
 .blob{position:fixed;border-radius:50%;filter:blur(90px);pointer-events:none;z-index:0;}
-.b1{width:500px;height:500px;background:rgba(247,183,49,.04);top:-150px;right:-100px;}
+.b1{width:500px;height:500px;background:rgba(247,183,49,.05);top:-150px;right:-100px;}
 .b2{width:400px;height:400px;background:rgba(0,229,255,.03);bottom:-50px;left:-120px;}
 
-/* ── App shell ── */
+/* ── PARTICLES ── */
+#particle-canvas{position:fixed;inset:0;pointer-events:none;z-index:0;}
+
+/* ── APP ── */
 #app{position:relative;z-index:1;display:flex;flex-direction:column;height:100%;}
 
-/* ── Topbar ── */
-#topbar{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:12px 20px;background:rgba(13,17,23,.9);backdrop-filter:blur(12px);
-  border-bottom:1px solid var(--border);flex-shrink:0;
-}
+/* ── TOPBAR ── */
+#topbar{display:flex;align-items:center;justify-content:space-between;
+  padding:12px 20px;background:rgba(8,11,16,.92);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border);flex-shrink:0;}
 .logo{display:flex;align-items:center;gap:9px;text-decoration:none;}
-.logo-mark{width:32px;height:32px;background:linear-gradient(135deg,var(--accent),var(--a2));border-radius:8px;
-  display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#000;}
+.logo-mark{width:32px;height:32px;background:linear-gradient(135deg,var(--accent),var(--a2));
+  border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#000;}
 .logo-name{font-size:17px;font-weight:800;letter-spacing:.06em;
   background:linear-gradient(90deg,var(--accent),var(--a2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .acct-pill{display:none;align-items:center;gap:7px;background:var(--card);border:1px solid var(--border);
-  border-radius:100px;padding:5px 12px 5px 7px;font-family:'Space Mono',monospace;font-size:11px;color:var(--text2);max-width:180px;}
+  border-radius:100px;padding:5px 12px 5px 7px;font-family:'Space Mono',monospace;font-size:11px;color:var(--text2);max-width:200px;}
 .acct-pill.on{display:flex;}
-.dot{width:7px;height:7px;background:var(--green);border-radius:50%;box-shadow:0 0 7px var(--green);animation:pulse 2s infinite;flex-shrink:0;}
-@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+.dot{width:7px;height:7px;background:var(--green);border-radius:50%;box-shadow:0 0 7px var(--green);animation:blink 2s infinite;flex-shrink:0;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.3;}}
 .acct-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 
-/* ── Bottom nav ── */
-#nav{
-  display:none;flex-shrink:0;
-  background:rgba(13,17,23,.95);backdrop-filter:blur(14px);
-  border-top:1px solid var(--border);
-  padding:0 0 env(safe-area-inset-bottom,0);
-}
+/* ── NAV ── */
+#nav{display:none;flex-shrink:0;background:rgba(8,11,16,.96);backdrop-filter:blur(16px);
+  border-top:1px solid var(--border);padding:0 0 env(safe-area-inset-bottom,0);}
 #nav.on{display:flex;}
-#nav button{
-  flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;
-  background:none;border:none;color:var(--muted);padding:10px 6px;cursor:pointer;
-  font-family:'Syne',sans-serif;font-size:10px;font-weight:600;letter-spacing:.06em;transition:color .2s;
-}
+#nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+  background:none;border:none;color:var(--muted);padding:10px 4px 8px;cursor:pointer;
+  font-family:'Syne',sans-serif;font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;transition:color .2s;}
 #nav button.active{color:var(--accent);}
-#nav button .n-icon{font-size:20px;transition:transform .2s;}
-#nav button.active .n-icon{transform:translateY(-2px);}
+#nav button svg{width:20px;height:20px;transition:transform .2s;}
+#nav button.active svg{transform:translateY(-2px);}
 
-/* ── Page container ── */
+/* ── PAGES ── */
 #pages{flex:1;overflow:hidden;position:relative;}
-.page{position:absolute;inset:0;overflow-y:auto;padding:20px;display:none;animation:fadeIn .25s ease;}
-.page.active{display:block;}
-@keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+.page{position:absolute;inset:0;overflow-y:auto;padding:20px;display:none;}
+.page.active{display:block;animation:fadeIn .25s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
 
-/* ── Login page ── */
+/* ── LOGIN ── */
 #page-login{display:flex;align-items:center;justify-content:center;}
-.login-wrap{width:100%;max-width:440px;}
+.login-wrap{width:100%;max-width:420px;}
 .login-badge{display:inline-flex;align-items:center;gap:6px;font-family:'Space Mono',monospace;font-size:10px;
   letter-spacing:.14em;color:var(--accent);text-transform:uppercase;background:rgba(247,183,49,.08);
   border:1px solid rgba(247,183,49,.2);border-radius:100px;padding:4px 12px;margin-bottom:22px;}
@@ -89,6 +82,7 @@ body::before{content:'';position:fixed;inset:0;
   border:1px solid var(--border);border-radius:var(--r);cursor:pointer;width:100%;color:var(--text);
   font-family:'Syne',sans-serif;margin-bottom:10px;transition:all .2s;}
 .w-btn:hover{border-color:var(--accent);background:rgba(247,183,49,.04);transform:translateY(-1px);}
+.w-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
 .w-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
 .w-icon.anc{background:rgba(83,126,255,.15);}
 .w-icon.cld{background:rgba(247,183,49,.12);}
@@ -97,198 +91,233 @@ body::before{content:'';position:fixed;inset:0;
 .w-desc{font-size:11px;color:var(--muted);}
 .w-arr{color:var(--muted);transition:transform .2s,color .2s;}
 .w-btn:hover .w-arr{transform:translateX(3px);color:var(--accent);}
-.divider-line{display:flex;align-items:center;gap:10px;margin:6px 0;}
-.divider-line::before,.divider-line::after{content:'';flex:1;height:1px;background:var(--border);}
-.divider-line span{font-size:10px;color:var(--muted);font-family:'Space Mono',monospace;}
-#login-status{font-size:12px;color:var(--muted);text-align:center;margin-top:14px;font-family:'Space Mono',monospace;min-height:18px;}
+.divider-or{display:flex;align-items:center;gap:10px;margin:6px 0;}
+.divider-or::before,.divider-or::after{content:'';flex:1;height:1px;background:var(--border);}
+.divider-or span{font-size:10px;color:var(--muted);font-family:'Space Mono',monospace;}
+#login-status{font-size:12px;color:var(--muted);text-align:center;margin-top:14px;
+  font-family:'Space Mono',monospace;min-height:18px;}
 
-/* ── Cards / surface ── */
+/* ── CARDS ── */
 .card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);}
 .section-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:10px;}
 .section-title{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);}
 
-/* ── Search bar ── */
-.search-wrap{position:relative;margin-bottom:14px;}
+/* ── SEARCH ── */
+.search-wrap{position:relative;margin-bottom:12px;}
 .search-wrap input{width:100%;background:var(--s2);border:1px solid var(--border);border-radius:10px;
-  padding:10px 14px 10px 36px;color:var(--text);font-family:'Space Mono',monospace;font-size:12px;outline:none;transition:border-color .2s;}
+  padding:9px 14px 9px 34px;color:var(--text);font-family:'Space Mono',monospace;font-size:12px;outline:none;transition:border-color .2s;}
 .search-wrap input:focus{border-color:var(--accent);}
 .search-wrap input::placeholder{color:var(--muted);}
-.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:14px;pointer-events:none;}
+.search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px;pointer-events:none;}
 
-/* ── Dashboard layout ── */
-#page-home .dashboard{display:grid;grid-template-columns:1fr 1fr;gap:16px;height:100%;}
-@media(max-width:640px){#page-home .dashboard{grid-template-columns:1fr;}}
+/* ── DASHBOARD ── */
+#page-home .dashboard{display:grid;grid-template-columns:1fr 1fr;gap:14px;
+  height:calc(100vh - 120px);min-height:0;}
+@media(max-width:640px){
+  #page-home{padding:12px;}
+  #page-home .dashboard{grid-template-columns:1fr;height:auto;}
+  #page-home .dash-col .card{min-height:320px;}
+}
 .dash-col{display:flex;flex-direction:column;min-height:0;}
-.dash-col .card{flex:1;overflow:hidden;display:flex;flex-direction:column;padding:16px;}
-.scroll-list{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;}
+.dash-col .card{flex:1;overflow:hidden;display:flex;flex-direction:column;padding:14px;}
+.scroll-list{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:7px;padding-right:2px;}
 
-/* ── Contact cards ── */
+/* ── CONTACT CARDS ── */
 .contact-card{background:var(--s2);border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:border-color .2s;}
-.contact-card:hover{border-color:rgba(247,183,49,.3);}
-.contact-head{display:flex;align-items:center;gap:10px;padding:11px 13px;cursor:pointer;}
-.contact-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--a2));
+.contact-card:hover{border-color:rgba(247,183,49,.25);}
+.contact-head{display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer;user-select:none;}
+.contact-avatar{width:33px;height:33px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--a2));
   display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#000;flex-shrink:0;}
 .contact-main{flex:1;min-width:0;}
 .contact-name{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .contact-wallet{font-family:'Space Mono',monospace;font-size:10px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.contact-chevron{color:var(--muted);font-size:12px;transition:transform .25s;flex-shrink:0;}
-.contact-card.open .contact-chevron{transform:rotate(180deg);}
-.contact-body{display:none;padding:0 13px 13px;border-top:1px solid var(--border);margin-top:0;}
+.chev{color:var(--muted);font-size:11px;transition:transform .25s;flex-shrink:0;}
+.contact-card.open .chev{transform:rotate(180deg);}
+.contact-body{display:none;padding:0 12px 12px;border-top:1px solid var(--border);}
 .contact-card.open .contact-body{display:block;}
-.cinfo-row{display:flex;gap:6px;align-items:flex-start;margin-top:10px;font-size:12px;}
-.cinfo-lbl{color:var(--muted);font-family:'Space Mono',monospace;font-size:10px;flex-shrink:0;padding-top:1px;min-width:60px;}
+.cinfo-row{display:flex;gap:6px;align-items:flex-start;margin-top:9px;font-size:12px;}
+.cinfo-lbl{color:var(--muted);font-family:'Space Mono',monospace;font-size:10px;flex-shrink:0;padding-top:1px;min-width:58px;}
 .cinfo-val{color:var(--text2);word-break:break-all;flex:1;}
-.c-actions{display:flex;gap:6px;margin-top:12px;}
-.c-btn{flex:1;padding:7px;background:var(--s1);border:1px solid var(--border);border-radius:8px;
-  color:var(--text2);font-family:'Space Mono',monospace;font-size:10px;cursor:pointer;transition:all .2s;}
+.c-actions{display:flex;gap:6px;margin-top:11px;}
+.c-btn{flex:1;padding:6px;background:var(--s1);border:1px solid var(--border);border-radius:7px;
+  color:var(--text2);font-family:'Space Mono',monospace;font-size:10px;cursor:pointer;transition:all .2s;text-align:center;}
 .c-btn:hover{border-color:var(--accent);color:var(--accent);}
 .c-btn.del:hover{border-color:var(--red);color:var(--red);}
 .c-btn.send-c:hover{border-color:var(--green);color:var(--green);}
 .sent-total{font-family:'Space Mono',monospace;font-size:10px;color:var(--text2);margin-top:8px;
-  background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.12);border-radius:6px;padding:6px 10px;}
+  background:rgba(0,229,255,.05);border:1px solid rgba(0,229,255,.1);border-radius:6px;padding:6px 10px;line-height:1.6;}
 .sent-total strong{color:var(--a3);}
 
-/* ── Token row ── */
-.token-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--s2);
+/* ── TOKEN ROW ── */
+.token-row{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--s2);
   border:1px solid var(--border);border-radius:10px;transition:border-color .2s;}
 .token-row:hover{border-color:rgba(247,183,49,.2);}
-.token-icon{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#1e3a4a,#2a4d63);
-  display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--accent);flex-shrink:0;}
+.token-icon{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#1a3347,#24495f);
+  display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--accent);flex-shrink:0;}
 .token-info{flex:1;min-width:0;}
 .token-sym{font-size:13px;font-weight:700;}
 .token-contract{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);}
-.token-balance{font-family:'Space Mono',monospace;font-size:13px;color:var(--text);text-align:right;flex-shrink:0;}
-.token-loading{text-align:center;padding:24px;color:var(--muted);font-size:13px;font-family:'Space Mono',monospace;}
+.token-balance{font-family:'Space Mono',monospace;font-size:12px;color:var(--text);text-align:right;flex-shrink:0;}
+.token-loading{text-align:center;padding:28px 16px;color:var(--muted);font-size:12px;font-family:'Space Mono',monospace;}
 
-/* ── Buttons ── */
-.btn-primary{display:flex;align-items:center;justify-content:center;gap:8px;
-  padding:12px 18px;background:linear-gradient(135deg,var(--accent),var(--a2));
-  border:none;border-radius:10px;color:#000;font-family:'Syne',sans-serif;
-  font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;width:100%;}
-.btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(247,183,49,.3);}
-.btn-primary:active{transform:none;}
-.btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none;}
+/* ── BUTTONS ── */
+.btn-primary{display:flex;align-items:center;justify-content:center;gap:8px;padding:13px 18px;
+  background:linear-gradient(135deg,var(--accent),var(--a2));border:none;border-radius:10px;
+  color:#000;font-family:'Syne',sans-serif;font-size:14px;font-weight:800;cursor:pointer;transition:all .2s;width:100%;}
+.btn-primary:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 8px 24px rgba(247,183,49,.3);}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;}
 .btn-ghost{background:none;border:1px solid var(--border);border-radius:8px;padding:7px 14px;
   color:var(--text2);font-family:'Space Mono',monospace;font-size:11px;cursor:pointer;transition:all .2s;}
 .btn-ghost:hover{border-color:var(--text2);color:var(--text);}
-.btn-icon{background:none;border:none;cursor:pointer;color:var(--accent);font-size:18px;padding:4px;transition:transform .2s;}
-.btn-icon:hover{transform:scale(1.15);}
 
-/* ── Send page ── */
-#page-send .send-card{max-width:500px;margin:0 auto;padding:24px;}
-.field{display:flex;flex-direction:column;gap:7px;margin-bottom:18px;}
+/* ── SEND PAGE ── */
+#page-send .send-wrap{max-width:500px;margin:0 auto;}
+#page-send .card{padding:22px;}
+.field{display:flex;flex-direction:column;gap:7px;margin-bottom:16px;}
 .field label{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);}
-.field input,.field textarea,.field select{
-  background:var(--s2);border:1px solid var(--border);border-radius:10px;
+.field input,.field textarea{background:var(--s2);border:1px solid var(--border);border-radius:10px;
   padding:12px 14px;color:var(--text);font-family:'Space Mono',monospace;font-size:13px;outline:none;
   transition:border-color .2s,box-shadow .2s;width:100%;}
-.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(247,183,49,.1);}
+.field input:focus,.field textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(247,183,49,.1);}
 .field input::placeholder,.field textarea::placeholder{color:var(--muted);}
-.field select{-webkit-appearance:none;appearance:none;cursor:pointer;}
-.input-row{display:flex;gap:8px;align-items:flex-end;}
-.input-row .field{flex:1;}
+.field input.over{border-color:var(--red)!important;box-shadow:0 0 0 3px rgba(255,58,92,.15)!important;}
+
+/* ── DROPDOWN TRIGGER ── */
+.dropdown-trigger{display:flex;align-items:center;gap:10px;padding:11px 14px;
+  background:var(--s2);border:1px solid var(--border);border-radius:10px;cursor:pointer;
+  transition:all .2s;user-select:none;}
+.dropdown-trigger:hover{border-color:var(--accent);}
+.dt-placeholder{color:var(--muted);font-family:'Space Mono',monospace;font-size:12px;flex:1;}
+.dt-value{flex:1;}
+.dt-name{font-size:13px;font-weight:700;}
+.dt-sub{font-family:'Space Mono',monospace;font-size:10px;color:var(--text2);}
+.dt-arrow{color:var(--muted);font-size:11px;transition:transform .2s;flex-shrink:0;}
+.dropdown-trigger.open .dt-arrow{transform:rotate(180deg);}
+
+/* ── DROPDOWN PANEL ── */
+.dropdown-panel{display:none;position:absolute;left:0;right:0;top:calc(100% + 6px);
+  background:var(--card);border:1px solid var(--border);border-radius:12px;
+  box-shadow:0 16px 48px rgba(0,0,0,.7);z-index:100;overflow:hidden;}
+.dropdown-panel.open{display:block;animation:dropIn .18s ease;}
+@keyframes dropIn{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:none;}}
+.dp-search{padding:10px;border-bottom:1px solid var(--border);}
+.dp-search input{width:100%;background:var(--s2);border:1px solid var(--border);border-radius:8px;
+  padding:8px 12px;color:var(--text);font-family:'Space Mono',monospace;font-size:12px;outline:none;}
+.dp-search input:focus{border-color:var(--accent);}
+.dp-search input::placeholder{color:var(--muted);}
+.dp-list{max-height:240px;overflow-y:auto;}
+.dp-item{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;transition:background .15s;}
+.dp-item:hover{background:rgba(247,183,49,.06);}
+.dp-item.sel{background:rgba(247,183,49,.08);}
+.dp-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--a2));
+  display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:#000;flex-shrink:0;}
+.dp-token-icon{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#1a3347,#24495f);
+  display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--accent);flex-shrink:0;}
+.dp-main{flex:1;min-width:0;}
+.dp-name{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.dp-sub{font-family:'Space Mono',monospace;font-size:10px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.dp-bal{font-family:'Space Mono',monospace;font-size:11px;color:var(--text2);text-align:right;flex-shrink:0;}
+.dp-check{color:var(--accent);font-size:12px;flex-shrink:0;}
+.dp-empty{padding:20px;text-align:center;color:var(--muted);font-size:12px;font-family:'Space Mono',monospace;}
+
+/* amount row */
+.amount-row{display:flex;align-items:flex-end;gap:10px;}
+.amount-row .field{flex:1;margin-bottom:0;}
 .amount-wrap{position:relative;}
-.amount-wrap input{padding-right:56px;}
-.amount-suf{position:absolute;right:14px;top:50%;transform:translateY(-50%);
-  font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:var(--accent);}
-.or-divider{display:flex;align-items:center;gap:8px;margin:8px 0;}
-.or-divider::before,.or-divider::after{content:'';flex:1;height:1px;background:var(--border);}
-.or-divider span{font-size:10px;color:var(--muted);font-family:'Space Mono',monospace;}
-.contact-pick{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-bottom:18px;}
-.cpick{padding:10px 12px;background:var(--s2);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:all .2s;text-align:left;}
-.cpick:hover,.cpick.sel{border-color:var(--accent);background:rgba(247,183,49,.05);}
-.cpick-name{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.cpick-wallet{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.token-select-list{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px;}
-.tsym{padding:6px 12px;background:var(--s2);border:1px solid var(--border);border-radius:100px;
-  cursor:pointer;font-family:'Space Mono',monospace;font-size:11px;color:var(--text2);transition:all .2s;}
-.tsym:hover,.tsym.sel{background:rgba(247,183,49,.1);border-color:var(--accent);color:var(--accent);}
+.amount-wrap input{padding-right:60px;}
+.amount-suf{position:absolute;right:13px;top:50%;transform:translateY(-50%);
+  font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:var(--accent);pointer-events:none;}
+.max-btn{padding:10px 14px;background:rgba(247,183,49,.1);border:1px solid rgba(247,183,49,.25);
+  border-radius:10px;color:var(--accent);font-family:'Space Mono',monospace;font-size:11px;
+  cursor:pointer;white-space:nowrap;transition:all .2s;flex-shrink:0;}
+.max-btn:hover{background:rgba(247,183,49,.2);}
+.avail-label{font-family:'Space Mono',monospace;font-size:11px;margin-top:5px;}
+.avail-label.ok{color:var(--text2);}
+.avail-label.warn{color:var(--red);}
 
-/* ── Contacts tab ── */
-#page-contacts .tab-bar{display:flex;gap:0;margin-bottom:16px;background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:3px;}
-#page-contacts .tab-bar button{flex:1;padding:8px;background:none;border:none;color:var(--muted);
-  font-family:'Syne',sans-serif;font-size:13px;font-weight:600;cursor:pointer;border-radius:7px;transition:all .2s;}
-#page-contacts .tab-bar button.active{background:var(--card);color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,.3);}
-
-/* ── New contact form ── */
-#contact-form-wrap{display:none;}
-#contact-form-wrap.visible{display:block;}
-#contact-list-wrap{display:block;}
-#contact-list-wrap.hidden{display:none;}
-
-/* ── Modal / overlay ── */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);z-index:200;
-  display:none;align-items:center;justify-content:center;padding:20px;}
-.overlay.open{display:flex;}
-.modal{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:24px;
-  max-width:360px;width:100%;box-shadow:0 24px 60px rgba(0,0,0,.6);}
-.modal h3{font-size:16px;font-weight:700;margin-bottom:8px;}
-.modal p{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:20px;}
-.modal-actions{display:flex;gap:8px;}
-.modal-actions button{flex:1;padding:10px;border-radius:8px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all .2s;}
-.modal-confirm{background:var(--red);color:#fff;}
-.modal-confirm:hover{background:#cc2a48;}
-.modal-cancel{background:var(--s2);color:var(--text);border:1px solid var(--border)!important;}
-
-/* ── Toast ── */
-#toast{position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 70px);left:50%;
-  transform:translateX(-50%) translateY(120px);background:var(--card);border:1px solid var(--border);
-  border-radius:12px;padding:12px 18px;font-size:12px;font-family:'Space Mono',monospace;
-  display:flex;align-items:center;gap:8px;z-index:300;transition:transform .4s cubic-bezier(.34,1.56,.64,1);
-  box-shadow:0 16px 48px rgba(0,0,0,.5);white-space:nowrap;max-width:90vw;}
-@media(max-width:640px){#toast{bottom:calc(env(safe-area-inset-bottom,0px) + 80px);}}
-#toast.show{transform:translateX(-50%) translateY(0);}
-#toast.success{border-color:rgba(57,255,135,.3);}
-#toast.error{border-color:rgba(255,58,92,.3);}
-.t-icon{font-size:14px;}
-
-/* ── Spinner ── */
-.spinner{width:14px;height:14px;border:2px solid rgba(0,0,0,.3);border-top-color:#000;border-radius:50%;animation:spin .7s linear infinite;display:none;flex-shrink:0;}
-@keyframes spin{to{transform:rotate(360deg);}}
-.btn-primary.loading .spinner{display:block;}
-.btn-primary.loading .btn-text{display:none;}
-
-/* ── Tx result ── */
+/* tx result */
 .tx-result{background:rgba(57,255,135,.05);border:1px solid rgba(57,255,135,.2);border-radius:10px;
   padding:12px 14px;font-family:'Space Mono',monospace;font-size:11px;color:var(--green);
-  word-break:break-all;line-height:1.7;margin-top:14px;display:none;}
+  word-break:break-all;line-height:1.8;margin-top:14px;display:none;}
 .tx-result a{color:var(--accent);text-decoration:none;}
 .tx-result a:hover{text-decoration:underline;}
 
-/* ── Settings page ── */
-#page-settings .settings-card{max-width:480px;margin:0 auto;padding:24px;}
-.setting-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border);gap:16px;}
+/* spinner */
+.spinner{width:14px;height:14px;border:2px solid rgba(0,0,0,.3);border-top-color:#000;
+  border-radius:50%;animation:spin .7s linear infinite;display:none;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.btn-primary.loading .spinner{display:block;}
+.btn-primary.loading .btn-label{display:none;}
+
+/* ── CONTACTS PAGE ── */
+#page-contacts .tab-bar{display:flex;gap:0;margin-bottom:14px;background:var(--s2);
+  border:1px solid var(--border);border-radius:10px;padding:3px;}
+#page-contacts .tab-bar button{flex:1;padding:8px;background:none;border:none;color:var(--muted);
+  font-family:'Syne',sans-serif;font-size:13px;font-weight:600;cursor:pointer;border-radius:7px;transition:all .2s;}
+#page-contacts .tab-bar button.active{background:var(--card);color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,.3);}
+.cf-hidden{display:none!important;}
+
+/* ── SETTINGS ── */
+#page-settings .settings-inner{max-width:480px;margin:0 auto;}
+#page-settings .card{padding:22px;}
+.setting-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;
+  border-bottom:1px solid var(--border);gap:16px;}
 .setting-row:last-child{border-bottom:none;}
 .setting-lbl{font-size:14px;font-weight:600;}
-.setting-sub{font-size:12px;color:var(--muted);margin-top:3px;}
-.btn-danger{padding:9px 16px;background:rgba(255,58,92,.1);border:1px solid rgba(255,58,92,.3);
+.setting-sub{font-size:11px;color:var(--muted);margin-top:3px;}
+.btn-danger{padding:8px 14px;background:rgba(255,58,92,.1);border:1px solid rgba(255,58,92,.25);
   border-radius:8px;color:var(--red);font-family:'Space Mono',monospace;font-size:11px;cursor:pointer;transition:all .2s;}
 .btn-danger:hover{background:rgba(255,58,92,.2);}
 
-/* ── Empty states ── */
-.empty{text-align:center;padding:32px 16px;color:var(--muted);font-size:13px;}
-.empty-icon{font-size:32px;margin-bottom:8px;opacity:.5;}
+/* ── MODALS ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(5px);z-index:200;
+  display:none;align-items:center;justify-content:center;padding:20px;}
+.overlay.open{display:flex;}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:var(--r);
+  padding:24px;max-width:340px;width:100%;box-shadow:0 24px 60px rgba(0,0,0,.7);}
+.modal h3{font-size:16px;font-weight:800;margin-bottom:8px;}
+.modal p{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:20px;}
+.modal-btns{display:flex;gap:8px;}
+.modal-btns button{flex:1;padding:10px;border-radius:8px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all .2s;}
+.m-confirm{background:var(--red);color:#fff;}
+.m-confirm:hover{background:#cc2848;}
+.m-cancel{background:var(--s2);color:var(--text);border:1px solid var(--border)!important;}
 
-/* ── Responsiveness ── */
-@media(max-width:640px){
-  .page{padding:14px;}
-  #page-home .dashboard{gap:12px;}
-  .login-h{font-size:26px;}
-}
+/* ── TOAST ── */
+#toast{position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 76px);left:50%;
+  transform:translateX(-50%) translateY(120px);background:var(--card);border:1px solid var(--border);
+  border-radius:12px;padding:11px 16px;font-size:12px;font-family:'Space Mono',monospace;
+  display:flex;align-items:center;gap:8px;z-index:300;
+  transition:transform .4s cubic-bezier(.34,1.56,.64,1);
+  box-shadow:0 16px 48px rgba(0,0,0,.6);max-width:90vw;white-space:nowrap;}
+#toast.show{transform:translateX(-50%) translateY(0);}
+#toast.success{border-color:rgba(57,255,135,.3);}
+#toast.error{border-color:rgba(255,58,92,.3);}
+
+/* ── EMPTY ── */
+.empty{text-align:center;padding:28px 16px;color:var(--muted);font-size:12px;font-family:'Space Mono',monospace;}
+.empty-ico{font-size:28px;margin-bottom:7px;opacity:.4;}
+
+/* ── FIELD DROPDOWN container ── */
+.field-dropdown{position:relative;}
 </style>
 </head>
 <body>
-<div class="blob b1"></div><div class="blob b2"></div>
+<div class="blob b1"></div>
+<div class="blob b2"></div>
+<canvas id="particle-canvas"></canvas>
+
 <div id="app">
-  <!-- TOP BAR -->
+  <!-- TOPBAR -->
   <div id="topbar">
-    <a class="logo" href="#"><div class="logo-mark">W</div><div class="logo-name">WAXSEND</div></a>
+    <div class="logo"><div class="logo-mark">W</div><div class="logo-name">WAXSEND</div></div>
     <div class="acct-pill" id="acct-pill"><div class="dot"></div><span class="acct-name" id="acct-name">—</span></div>
   </div>
 
-  <!-- PAGE CONTAINER -->
+  <!-- PAGES -->
   <div id="pages">
-    <!-- LOGIN -->
+
+    <!-- ── LOGIN ── -->
     <div class="page active" id="page-login">
       <div class="login-wrap">
         <div class="login-badge">⬡ WAX Blockchain</div>
@@ -299,7 +328,7 @@ body::before{content:'';position:fixed;inset:0;
           <div class="w-inf"><div class="w-name">Anchor Wallet</div><div class="w-desc">Desktop & mobile EOSIO wallet</div></div>
           <span class="w-arr">→</span>
         </button>
-        <div class="divider-line"><span>or</span></div>
+        <div class="divider-or"><span>or</span></div>
         <button class="w-btn" id="btn-cloud">
           <div class="w-icon cld">☁️</div>
           <div class="w-inf"><div class="w-name">MyCloudWallet</div><div class="w-desc">Web-based WAX wallet</div></div>
@@ -309,15 +338,14 @@ body::before{content:'';position:fixed;inset:0;
       </div>
     </div>
 
-    <!-- HOME / DASHBOARD -->
+    <!-- ── HOME ── -->
     <div class="page" id="page-home">
       <div class="dashboard">
-        <!-- Contacts column -->
         <div class="dash-col">
           <div class="card">
             <div class="section-hd">
               <span class="section-title">Contacts</span>
-              <button class="btn-icon" id="goto-new-contact" title="New contact">＋</button>
+              <button class="btn-ghost" id="goto-new-contact" style="font-size:11px;padding:5px 10px;">＋ New</button>
             </div>
             <div class="search-wrap">
               <span class="search-icon">🔍</span>
@@ -326,12 +354,11 @@ body::before{content:'';position:fixed;inset:0;
             <div class="scroll-list" id="contact-list-home"></div>
           </div>
         </div>
-        <!-- Tokens column -->
         <div class="dash-col">
           <div class="card">
             <div class="section-hd">
               <span class="section-title">Your Tokens</span>
-              <button class="btn-ghost" id="refresh-tokens" style="font-size:10px">↻ Refresh</button>
+              <button class="btn-ghost" id="refresh-tokens" style="font-size:11px;padding:5px 10px;">↻ Refresh</button>
             </div>
             <div class="search-wrap">
               <span class="search-icon">🔍</span>
@@ -343,51 +370,80 @@ body::before{content:'';position:fixed;inset:0;
       </div>
     </div>
 
-    <!-- SEND -->
+    <!-- ── SEND ── -->
     <div class="page" id="page-send">
-      <div class="card send-card">
-        <div class="section-hd" style="margin-bottom:20px">
-          <span class="section-title">Send Tokens</span>
-        </div>
-
-        <div class="field">
-          <label>Recipient Address</label>
-          <input type="text" id="send-to" placeholder="waxaccount.wam" autocomplete="off" spellcheck="false"/>
-        </div>
-
-        <div class="or-divider"><span>or pick contact</span></div>
-        <div class="contact-pick" id="contact-pick"></div>
-
-        <div class="field">
-          <label>Select Token</label>
-          <div class="token-select-list" id="token-pick"></div>
-          <input type="hidden" id="send-token-sym"/>
-          <input type="hidden" id="send-token-contract"/>
-          <input type="hidden" id="send-token-precision"/>
-        </div>
-
-        <div class="field">
-          <label>Amount</label>
-          <div class="amount-wrap">
-            <input type="number" id="send-amount" placeholder="0.00000000" min="0" step="any"/>
-            <div class="amount-suf" id="send-sym-label">—</div>
+      <div class="send-wrap">
+        <div class="card">
+          <div class="section-hd" style="margin-bottom:20px">
+            <span class="section-title">Send Tokens</span>
           </div>
-        </div>
 
-        <div class="field">
-          <label>Memo <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
-          <input type="text" id="send-memo" placeholder="Add a note…" maxlength="256"/>
-        </div>
+          <!-- Recipient dropdown -->
+          <div class="field">
+            <label>Recipient</label>
+            <div class="field-dropdown">
+              <div class="dropdown-trigger" id="contact-trigger">
+                <span class="dt-placeholder" id="contact-trigger-text">Enter address or pick contact…</span>
+                <span class="dt-arrow">▾</span>
+              </div>
+              <div class="dropdown-panel" id="contact-dropdown">
+                <div class="dp-search">
+                  <input type="text" id="contact-dp-search" placeholder="Search contacts or type address…" autocomplete="off"/>
+                </div>
+                <div class="dp-list" id="contact-dp-list"></div>
+              </div>
+            </div>
+            <input type="hidden" id="send-to"/>
+          </div>
 
-        <button class="btn-primary" id="do-send">
-          <div class="spinner"></div>
-          <span class="btn-text">⚡ Sign & Send</span>
-        </button>
-        <div class="tx-result" id="tx-result"></div>
+          <!-- Token dropdown -->
+          <div class="field">
+            <label>Token</label>
+            <div class="field-dropdown">
+              <div class="dropdown-trigger" id="token-trigger">
+                <span class="dt-placeholder" id="token-trigger-text">Select a token…</span>
+                <span class="dt-arrow">▾</span>
+              </div>
+              <div class="dropdown-panel" id="token-dropdown">
+                <div class="dp-search">
+                  <input type="text" id="token-dp-search" placeholder="Search tokens…" autocomplete="off"/>
+                </div>
+                <div class="dp-list" id="token-dp-list"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Amount -->
+          <div class="field">
+            <label>Amount</label>
+            <div class="amount-row">
+              <div class="field" style="flex:1;margin-bottom:0;">
+                <div class="amount-wrap">
+                  <input type="number" id="send-amount" placeholder="0.00000000" min="0" step="any"/>
+                  <div class="amount-suf" id="send-sym-label">—</div>
+                </div>
+              </div>
+              <button class="max-btn" id="max-btn">MAX</button>
+            </div>
+            <div class="avail-label ok" id="avail-label" style="display:none;"></div>
+          </div>
+
+          <!-- Memo -->
+          <div class="field">
+            <label>Memo <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:9px;">(optional)</span></label>
+            <input type="text" id="send-memo" placeholder="Add a note…" maxlength="256"/>
+          </div>
+
+          <button class="btn-primary" id="do-send">
+            <div class="spinner"></div>
+            <span class="btn-label">⚡ Sign &amp; Send</span>
+          </button>
+          <div class="tx-result" id="tx-result"></div>
+        </div>
       </div>
     </div>
 
-    <!-- CONTACTS MANAGEMENT -->
+    <!-- ── CONTACTS ── -->
     <div class="page" id="page-contacts">
       <div style="max-width:520px;margin:0 auto;">
         <div class="tab-bar">
@@ -395,29 +451,27 @@ body::before{content:'';position:fixed;inset:0;
           <button id="tab-new" onclick="showContactTab('new')">＋ New Contact</button>
         </div>
 
-        <!-- Contact list -->
         <div id="contact-list-wrap">
           <div class="search-wrap">
             <span class="search-icon">🔍</span>
-            <input type="text" id="contact-search-page" placeholder="Search…" autocomplete="off"/>
+            <input type="text" id="contact-search-page" placeholder="Search contacts…" autocomplete="off"/>
           </div>
           <div id="contact-list-page" style="display:flex;flex-direction:column;gap:8px;"></div>
         </div>
 
-        <!-- New / edit form -->
-        <div id="contact-form-wrap">
+        <div id="contact-form-wrap" class="cf-hidden">
           <div class="card" style="padding:22px;">
             <h3 style="font-size:16px;font-weight:800;margin-bottom:18px;" id="form-title">New Contact</h3>
             <input type="hidden" id="edit-id"/>
             <div class="field"><label>Display Name *</label><input type="text" id="cf-name" placeholder="e.g. CryptoFriend" autocomplete="off"/></div>
             <div class="field"><label>WAX Wallet *</label><input type="text" id="cf-wallet" placeholder="accountname.wam" autocomplete="off" spellcheck="false"/></div>
             <div class="field"><label>Discord Username</label><input type="text" id="cf-discord" placeholder="username#0000" autocomplete="off"/></div>
-            <div class="field"><label>Discord ID (optional)</label><input type="text" id="cf-discord-id" placeholder="123456789012345678" autocomplete="off"/></div>
-            <div class="field"><label>Description (optional)</label><input type="text" id="cf-desc" placeholder="How do you know them?" autocomplete="off"/></div>
+            <div class="field"><label>Discord ID <span style="font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></label><input type="text" id="cf-discord-id" placeholder="123456789012345678" autocomplete="off"/></div>
+            <div class="field"><label>Description <span style="font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></label><input type="text" id="cf-desc" placeholder="How do you know them?" autocomplete="off"/></div>
             <div style="display:flex;gap:8px;">
-              <button class="btn-ghost" onclick="showContactTab('list')" style="flex:1;">Cancel</button>
-              <button class="btn-primary" id="save-contact-btn" onclick="saveContact()" style="flex:2;">
-                <span class="btn-text">Save Contact</span>
+              <button class="btn-ghost" onclick="showContactTab('list')" style="flex:1;padding:12px;">Cancel</button>
+              <button class="btn-primary" id="save-contact-btn" style="flex:2;">
+                <span class="btn-label" id="save-lbl">Save Contact</span>
               </button>
             </div>
           </div>
@@ -425,258 +479,337 @@ body::before{content:'';position:fixed;inset:0;
       </div>
     </div>
 
-    <!-- SETTINGS -->
+    <!-- ── SETTINGS ── -->
     <div class="page" id="page-settings">
-      <div class="card settings-card">
-        <div class="section-title" style="margin-bottom:20px;">Settings</div>
-
-        <div class="setting-row">
-          <div><div class="setting-lbl">Connected Account</div><div class="setting-sub" id="settings-acct">—</div></div>
-          <button class="btn-ghost" id="disconnect-btn">Disconnect</button>
-        </div>
-
-        <div class="setting-row">
-          <div>
-            <div class="setting-lbl">Clear All Local Data</div>
-            <div class="setting-sub">Removes contacts & saved history from this browser</div>
+      <div class="settings-inner">
+        <div class="card">
+          <div class="section-title" style="margin-bottom:18px;">Settings</div>
+          <div class="setting-row">
+            <div><div class="setting-lbl">Connected Account</div><div class="setting-sub" id="settings-acct">—</div></div>
+            <button class="btn-ghost" id="disconnect-btn">Disconnect</button>
           </div>
-          <button class="btn-danger" id="clear-data-btn">Clear Data</button>
-        </div>
-
-        <div class="setting-row">
-          <div>
-            <div class="setting-lbl">About</div>
-            <div class="setting-sub">WAXSEND v2.0 · Built with WharfKit</div>
+          <div class="setting-row">
+            <div><div class="setting-lbl">Clear All Local Data</div><div class="setting-sub">Removes contacts & history from this browser</div></div>
+            <button class="btn-danger" id="clear-data-btn">Clear Data</button>
           </div>
-        </div>
-
-        <div style="margin-top:24px;font-size:11px;color:var(--muted);font-family:'Space Mono',monospace;line-height:1.8;">
-          🔒 All data stored locally in your browser.<br>
-          Keys never leave your wallet software.
+          <div class="setting-row">
+            <div><div class="setting-lbl">About</div><div class="setting-sub">WAXSEND v3 · Built with WharfKit</div></div>
+          </div>
+          <div style="margin-top:20px;font-size:11px;color:var(--muted);font-family:'Space Mono',monospace;line-height:1.9;">
+            🔒 All data stored locally in your browser.<br>
+            🔑 Keys never leave your wallet software.<br>
+            🌐 Transactions broadcast via WAX Greymass node.
+          </div>
         </div>
       </div>
     </div>
-  </div>
+
+  </div><!-- /pages -->
 
   <!-- BOTTOM NAV -->
   <nav id="nav">
-    <button id="nav-home" onclick="navTo('home')"><span class="n-icon">⌂</span>Home</button>
-    <button id="nav-send" onclick="navTo('send')"><span class="n-icon">↗</span>Send</button>
-    <button id="nav-contacts" onclick="navTo('contacts')"><span class="n-icon">◎</span>Contacts</button>
-    <button id="nav-settings" onclick="navTo('settings')"><span class="n-icon">⚙</span>Settings</button>
+    <button id="nav-home" onclick="navTo('home')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Home
+    </button>
+    <button id="nav-send" onclick="navTo('send')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      Send
+    </button>
+    <button id="nav-contacts" onclick="navTo('contacts')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Contacts
+    </button>
+    <button id="nav-settings" onclick="navTo('settings')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      Settings
+    </button>
   </nav>
 </div>
 
 <!-- MODALS -->
 <div class="overlay" id="modal-delete"><div class="modal">
   <h3>Delete Contact?</h3>
-  <p id="modal-del-msg">This will permanently remove this contact. This action cannot be undone.</p>
-  <div class="modal-actions">
-    <button class="modal-cancel" onclick="closeModal('modal-delete')">Cancel</button>
-    <button class="modal-confirm" id="modal-del-confirm">Delete</button>
+  <p id="modal-del-msg">This will permanently remove this contact.</p>
+  <div class="modal-btns">
+    <button class="m-cancel" onclick="closeModal('modal-delete')">Cancel</button>
+    <button class="m-confirm" id="modal-del-confirm">Delete</button>
   </div>
 </div></div>
 
 <div class="overlay" id="modal-clear"><div class="modal">
-  <h3>⚠️ Clear All Data?</h3>
-  <p>This will permanently delete all your contacts and local history. Your wallet connection will remain intact. This cannot be undone.</p>
-  <div class="modal-actions">
-    <button class="modal-cancel" onclick="closeModal('modal-clear')">Cancel</button>
-    <button class="modal-confirm" id="modal-clear-confirm1">Yes, clear it</button>
+  <h3>Clear All Data?</h3>
+  <p>This will permanently delete all your contacts and local history. Your wallet connection stays intact.</p>
+  <div class="modal-btns">
+    <button class="m-cancel" onclick="closeModal('modal-clear')">Cancel</button>
+    <button class="m-confirm" id="modal-clear-c1">Yes, continue</button>
   </div>
 </div></div>
 
 <div class="overlay" id="modal-clear2"><div class="modal">
-  <h3>🚨 Are you absolutely sure?</h3>
-  <p>Final confirmation: all locally stored contacts and transaction history will be wiped.</p>
-  <div class="modal-actions">
-    <button class="modal-cancel" onclick="closeModal('modal-clear2')">Cancel</button>
-    <button class="modal-confirm" id="modal-clear-confirm2">Wipe Everything</button>
+  <h3>🚨 Final Confirmation</h3>
+  <p>All locally stored contacts and transaction history will be permanently wiped. This cannot be undone.</p>
+  <div class="modal-btns">
+    <button class="m-cancel" onclick="closeModal('modal-clear2')">Cancel</button>
+    <button class="m-confirm" id="modal-clear-c2">Wipe Everything</button>
   </div>
 </div></div>
 
-<!-- TOAST -->
-<div id="toast"><span class="t-icon" id="t-icon">✓</span><span id="t-msg"></span></div>
+<div id="toast"><span id="t-icon">✓</span><span id="t-msg"></span></div>
 
+<!-- ═══════════════════════════════════════════ SCRIPT ═══════════════════════════════════════════ -->
 <script type="module">
-// ─────────────────────────────────────────────
-//  IMPORTS
-// ─────────────────────────────────────────────
-import { SessionKit } from 'https://esm.sh/@wharfkit/session@1'
-import { WebRenderer } from 'https://esm.sh/@wharfkit/web-renderer@1'
-import { WalletPluginAnchor } from 'https://esm.sh/@wharfkit/wallet-plugin-anchor@1'
+import { SessionKit }              from 'https://esm.sh/@wharfkit/session@1'
+import { WebRenderer }             from 'https://esm.sh/@wharfkit/web-renderer@1'
+import { WalletPluginAnchor }      from 'https://esm.sh/@wharfkit/wallet-plugin-anchor@1'
 import { WalletPluginCloudWallet } from 'https://esm.sh/@wharfkit/wallet-plugin-cloudwallet@1'
 
-// ─────────────────────────────────────────────
-//  CONFIG
-// ─────────────────────────────────────────────
+// ─── CONFIG ───────────────────────────────────────────────────────────────────
+const WAX_RPC = 'https://wax.greymass.com'
 const WAX_CHAIN = {
   id: '1064487b3cd1a897ce03ae5b6a865651747e2e152090f99c1d19d44e01aea5a4',
-  url: 'https://wax.greymass.com',
+  url: WAX_RPC,
 }
-const WAX_API = 'https://wax.greymass.com'
+
+// Comprehensive list of WAX tokens to check
 const KNOWN_TOKENS = [
-  { sym:'WAX', contract:'eosio.token', precision:8 },
-  { sym:'TLM', contract:'alien.worlds', precision:4 },
-  { sym:'BRWL', contract:'brawlertoken', precision:4 },
-  { sym:'TOCIUM', contract:'tociumsender', precision:4 },
-  { sym:'WOMBAT', contract:'wombattokens', precision:4 },
-  { sym:'SEST', contract:'karmatoken12', precision:4 },
+  { sym:'WAX',     contract:'eosio.token',     precision:8 },
+  { sym:'TLM',     contract:'alien.worlds',     precision:4 },
+  { sym:'BRWL',    contract:'brawlertoken',     precision:4 },
+  { sym:'TOCIUM',  contract:'tociumsender',     precision:4 },
+  { sym:'WOMBAT',  contract:'wombattokens',     precision:4 },
+  { sym:'SEST',    contract:'karmatoken12',     precision:4 },
+  { sym:'KENN',    contract:'kennbotoken1',     precision:4 },
+  { sym:'DUST',    contract:'thedust4play',     precision:8 },
+  { sym:'TACO',    contract:'tacostokens1',     precision:8 },
+  { sym:'TELOS',   contract:'eosio.token',      precision:4 },
+  { sym:'NEFTY',   contract:'neftypunksio',     precision:8 },
+  { sym:'CRUX',    contract:'cruxtoken111',     precision:8 },
+  { sym:'XPS',     contract:'xpspacetoken',     precision:8 },
+  { sym:'SCHWIFT', contract:'schwiftybase',     precision:8 },
+  { sym:'CAIT',    contract:'caittoken111',     precision:4 },
+  { sym:'CHIPS',   contract:'chipscontrac',     precision:4 },
+  { sym:'OG',      contract:'ogxogtokenss',     precision:8 },
+  { sym:'BLUX',    contract:'bluxtoken111',     precision:8 },
+  { sym:'LSWAX',   contract:'liquidstakin',     precision:8 },
+  { sym:'RWAX',    contract:'rwaxotctoken',     precision:8 },
 ]
 
-// ─────────────────────────────────────────────
-//  SESSION KIT
-// ─────────────────────────────────────────────
-const webRenderer = new WebRenderer()
-const sessionKit = new SessionKit({
-  appName:'waxsend',
-  chains:[WAX_CHAIN],
-  ui:webRenderer,
-  walletPlugins:[new WalletPluginAnchor(), new WalletPluginCloudWallet()],
+// ─── SESSION KIT ──────────────────────────────────────────────────────────────
+const renderer = new WebRenderer()
+const kit = new SessionKit({
+  appName: 'waxsend',
+  chains: [WAX_CHAIN],
+  ui: renderer,
+  walletPlugins: [new WalletPluginAnchor(), new WalletPluginCloudWallet()],
 })
 
-let SESSION = null
-let TOKENS  = []   // { sym, contract, precision, balance }
+// ─── STATE ────────────────────────────────────────────────────────────────────
+let SESSION  = null
+let TOKENS   = []   // fetched balances: {sym,contract,precision,balance,balStr}
+let selContact = null   // { id, name, wallet }
+let selToken   = null   // { sym, contract, precision, balance }
 
-// ─────────────────────────────────────────────
-//  LOCAL STORAGE HELPERS
-// ─────────────────────────────────────────────
-function lsGet(k){ try{ return JSON.parse(localStorage.getItem(k)) }catch(e){ return null } }
-function lsSet(k,v){ localStorage.setItem(k, JSON.stringify(v)) }
-
-function getContacts(){ return lsGet('waxsend_contacts') || [] }
-function saveContacts(arr){ lsSet('waxsend_contacts', arr) }
-
-function getSentHistory(){ return lsGet('waxsend_history') || {} }
-function recordSent(toWallet, amount, sym){
-  const h = getSentHistory()
-  const key = toWallet.toLowerCase()
+// ─── LOCAL STORAGE ────────────────────────────────────────────────────────────
+const lsGet = k => { try{ return JSON.parse(localStorage.getItem(k)) }catch{ return null } }
+const lsSet = (k,v) => localStorage.setItem(k, JSON.stringify(v))
+const getContacts   = ()  => lsGet('waxsend_contacts') || []
+const saveContacts  = arr => lsSet('waxsend_contacts', arr)
+const getHistory    = ()  => lsGet('waxsend_history')  || {}
+function recordSent(wallet, amount, sym){
+  const h = getHistory(), key = wallet.toLowerCase()
   if(!h[key]) h[key] = {}
-  if(!h[key][sym]) h[key][sym] = 0
-  h[key][sym] += parseFloat(amount) || 0
+  h[key][sym] = (h[key][sym]||0) + (parseFloat(amount)||0)
   lsSet('waxsend_history', h)
 }
-function getSentTo(wallet){
-  const h = getSentHistory()
-  return h[wallet.toLowerCase()] || {}
-}
+const getSentTo = w => (getHistory()[w.toLowerCase()] || {})
 
-// ─────────────────────────────────────────────
-//  TOAST
-// ─────────────────────────────────────────────
+// ─── TOAST ────────────────────────────────────────────────────────────────────
 function toast(msg, type='success'){
   const el = document.getElementById('toast')
-  document.getElementById('t-icon').textContent = type==='success'?'✓':'✕'
+  document.getElementById('t-icon').textContent = type==='success' ? '✓' : '✕'
   document.getElementById('t-msg').textContent  = msg
   el.className = `show ${type}`
   clearTimeout(el._t)
-  el._t = setTimeout(()=>el.className='',4500)
+  el._t = setTimeout(()=> el.className='', 4500)
 }
 
-// ─────────────────────────────────────────────
-//  NAV
-// ─────────────────────────────────────────────
+// ─── ESCAPE ───────────────────────────────────────────────────────────────────
+const esc = s => String(s||'').replace(/[<>&"']/g, c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c]))
+
+// ─── PARTICLES ────────────────────────────────────────────────────────────────
+;(()=>{
+  const canvas = document.getElementById('particle-canvas')
+  const ctx    = canvas.getContext('2d')
+  let W, H, particles=[]
+
+  const resize = ()=>{ W=canvas.width=innerWidth; H=canvas.height=innerHeight }
+  resize(); window.addEventListener('resize', resize)
+
+  const rand = (a,b) => a + Math.random()*(b-a)
+  const COLORS = ['rgba(247,183,49,', 'rgba(0,229,255,', 'rgba(255,107,53,', 'rgba(57,255,135,']
+
+  class Particle {
+    reset(){
+      this.x  = rand(0, W)
+      this.y  = rand(H*0.6, H+20)
+      this.vy = rand(0.2, 0.7)
+      this.vx = rand(-0.15, 0.15)
+      this.size = rand(1, 3.5)
+      this.color = COLORS[Math.floor(rand(0,COLORS.length))]
+      this.alpha = 0
+      this.maxAlpha = rand(0.15, 0.45)
+      this.fadeIn  = true
+    }
+    constructor(){ this.reset() }
+    update(){
+      this.y -= this.vy
+      this.x += this.vx
+      if(this.fadeIn){
+        this.alpha += 0.008
+        if(this.alpha >= this.maxAlpha) this.fadeIn=false
+      } else {
+        this.alpha -= 0.004
+      }
+      if(this.alpha <= 0 || this.y < -20){ this.reset() }
+    }
+    draw(){
+      ctx.beginPath()
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI*2)
+      ctx.fillStyle = this.color + this.alpha + ')'
+      ctx.fill()
+    }
+  }
+
+  for(let i=0;i<55;i++){
+    const p = new Particle()
+    p.y = rand(0, H)   // scatter initially
+    p.alpha = rand(0, p.maxAlpha)
+    particles.push(p)
+  }
+
+  const loop = ()=>{
+    ctx.clearRect(0,0,W,H)
+    particles.forEach(p=>{ p.update(); p.draw() })
+    requestAnimationFrame(loop)
+  }
+  loop()
+})()
+
+// ─── NAV ──────────────────────────────────────────────────────────────────────
 window.navTo = function(p){
   document.querySelectorAll('.page').forEach(e=>e.classList.remove('active'))
   document.querySelectorAll('#nav button').forEach(e=>e.classList.remove('active'))
   document.getElementById('page-'+p).classList.add('active')
   const nb = document.getElementById('nav-'+p)
   if(nb) nb.classList.add('active')
-  if(p==='home') renderDashboard()
-  if(p==='send') renderSendPage()
+  // close any open dropdowns
+  document.querySelectorAll('.dropdown-panel').forEach(d=>d.classList.remove('open'))
+  document.querySelectorAll('.dropdown-trigger').forEach(d=>d.classList.remove('open'))
+  if(p==='home')     { renderContactListHome(); renderTokenListHome() }
+  if(p==='send')     { renderContactDp(); renderTokenDp() }
   if(p==='contacts') renderContactsPage()
 }
 
-// ─────────────────────────────────────────────
-//  AUTH
-// ─────────────────────────────────────────────
-async function login(wallet){
-  const st = document.getElementById('login-status')
+// ─── AUTH ─────────────────────────────────────────────────────────────────────
+async function login(walletPlugin){
+  const st  = document.getElementById('login-status')
+  const ba  = document.getElementById('btn-anchor')
+  const bc  = document.getElementById('btn-cloud')
   st.textContent = 'Connecting…'
-  document.getElementById('btn-anchor').disabled = true
-  document.getElementById('btn-cloud').disabled  = true
-  try {
-    const r = await sessionKit.login({ walletPlugin: wallet })
+  ba.disabled = bc.disabled = true
+  try{
+    const r = await kit.login({ walletPlugin })
     SESSION = r.session
     afterLogin()
     toast(`Connected as ${String(SESSION.actor)}`)
-  } catch(e){
+  }catch(e){
     toast(e.message||'Login cancelled','error')
-    st.textContent = ''
-  } finally {
-    document.getElementById('btn-anchor').disabled = false
-    document.getElementById('btn-cloud').disabled  = false
+    st.textContent=''
+  }finally{
+    ba.disabled = bc.disabled = false
   }
 }
 
 function afterLogin(){
   const actor = String(SESSION.actor)
-  document.getElementById('acct-name').textContent = actor
+  document.getElementById('acct-name').textContent    = actor
   document.getElementById('acct-pill').classList.add('on')
   document.getElementById('settings-acct').textContent = actor
   document.getElementById('nav').classList.add('on')
+  // HIDE login page fully
+  document.getElementById('page-login').style.display = 'none'
   navTo('home')
   loadTokens()
 }
 
 async function logout(){
-  await sessionKit.logout().catch(()=>{})
-  SESSION = null
-  TOKENS  = []
+  await kit.logout().catch(()=>{})
+  SESSION = null; TOKENS = []; selContact = null; selToken = null
   document.getElementById('acct-pill').classList.remove('on')
   document.getElementById('nav').classList.remove('on')
-  document.querySelectorAll('.page').forEach(e=>e.classList.remove('active'))
+  document.querySelectorAll('.page').forEach(e=>{ e.classList.remove('active'); e.style.display='' })
   document.getElementById('page-login').classList.add('active')
   toast('Disconnected','error')
 }
 
-document.getElementById('btn-anchor').addEventListener('click',()=>login('anchor'))
-document.getElementById('btn-cloud').addEventListener('click',()=>login('cloudwallet'))
-document.getElementById('disconnect-btn').addEventListener('click',logout)
+document.getElementById('btn-anchor').addEventListener('click', ()=>login('anchor'))
+document.getElementById('btn-cloud').addEventListener('click',  ()=>login('cloudwallet'))
+document.getElementById('disconnect-btn').addEventListener('click', logout)
 
-// Restore session
+// Restore
 ;(async()=>{
   try{
-    const r = await sessionKit.restore()
-    if(r){ SESSION = r; afterLogin() }
-  }catch(e){}
+    const r = await kit.restore()
+    if(r){ SESSION=r; afterLogin() }
+  }catch{}
 })()
 
-// ─────────────────────────────────────────────
-//  TOKENS
-// ─────────────────────────────────────────────
+// ─── LOAD TOKENS ──────────────────────────────────────────────────────────────
 async function loadTokens(){
   if(!SESSION) return
   const actor = String(SESSION.actor)
-  document.getElementById('token-list').innerHTML = '<div class="token-loading">Loading balances…</div>'
+  document.getElementById('token-list').innerHTML = '<div class="token-loading">⟳ Fetching balances…</div>'
 
-  const results = []
-  await Promise.all(KNOWN_TOKENS.map(async t=>{
+  // Also try get_account for RAM/NET/CPU and main WAX balance
+  const results=[]
+
+  // Fetch all known token balances in parallel
+  const fetches = KNOWN_TOKENS.map(async t=>{
     try{
-      const r = await fetch(`${WAX_API}/v1/chain/get_currency_balance`,{
-        method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({code:t.contract,account:actor,symbol:t.sym})
+      const r = await fetch(`${WAX_RPC}/v1/chain/get_currency_balance`,{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({ code:t.contract, account:actor, symbol:t.sym })
       })
       const arr = await r.json()
-      if(arr && arr.length){
-        const bal = parseFloat(arr[0].split(' ')[0])
-        if(bal > 0) results.push({...t, balance:bal, balStr:arr[0]})
+      if(Array.isArray(arr) && arr.length){
+        const raw = arr[0]
+        const bal = parseFloat(raw.split(' ')[0])
+        if(bal > 0) results.push({...t, balance:bal, balStr:raw})
       }
-    }catch(e){}
-  }))
+    }catch{}
+  })
 
-  // Sort by balance descending
-  results.sort((a,b)=>b.balance - a.balance)
+  // Also try to discover extra tokens via get_currency_balances / dfuse-style
+  // We do a broader scan using get_table_rows on eosio.token
+  await Promise.all(fetches)
+
+  results.sort((a,b)=>b.balance-a.balance)
   TOKENS = results
-  renderTokenList()
-  renderTokenPick()
+  renderTokenListHome()
+  renderTokenDp()
+  updateAvailLabel()
 }
 
-function renderTokenList(filter=''){
+// ─── RENDER TOKEN LIST (HOME) ─────────────────────────────────────────────────
+function renderTokenListHome(filter=''){
   const el = document.getElementById('token-list')
-  const list = filter ? TOKENS.filter(t=>t.sym.toLowerCase().includes(filter.toLowerCase())) : TOKENS
+  const list = filter
+    ? TOKENS.filter(t=>t.sym.toLowerCase().includes(filter.toLowerCase())||t.contract.includes(filter.toLowerCase()))
+    : TOKENS
   if(!list.length){
-    el.innerHTML = `<div class="empty"><div class="empty-icon">◈</div>${filter?'No matching tokens':'No token balances found'}</div>`
+    el.innerHTML=`<div class="empty"><div class="empty-ico">◈</div>${filter?'No matching tokens':'No token balances found'}</div>`
     return
   }
   el.innerHTML = list.map(t=>`
@@ -689,16 +822,14 @@ function renderTokenList(filter=''){
       <div class="token-balance">${t.balStr}</div>
     </div>`).join('')
 }
-
-document.getElementById('token-search').addEventListener('input',e=>renderTokenList(e.target.value))
+document.getElementById('token-search').addEventListener('input',e=>renderTokenListHome(e.target.value))
 document.getElementById('refresh-tokens').addEventListener('click',loadTokens)
 
-// ─────────────────────────────────────────────
-//  CONTACTS HELPERS
-// ─────────────────────────────────────────────
-function avatarLetter(c){ return (c.name||c.discord||'?')[0].toUpperCase() }
-function renderContactCard(c, listEl, opts={}){
-  const sent  = getSentTo(c.wallet)
+// ─── CONTACT HELPERS ──────────────────────────────────────────────────────────
+const avatarLetter = c => (c.name||c.discord||'?')[0].toUpperCase()
+
+function buildContactCard(c, opts={}){
+  const sent = getSentTo(c.wallet)
   const sentHtml = Object.keys(sent).length
     ? `<div class="sent-total">Sent: ${Object.entries(sent).map(([s,v])=>`<strong>${v.toFixed(4)} ${s}</strong>`).join(' · ')}</div>`
     : ''
@@ -712,275 +843,336 @@ function renderContactCard(c, listEl, opts={}){
         <div class="contact-name">${esc(c.name)}</div>
         <div class="contact-wallet">${esc(c.wallet)}</div>
       </div>
-      <span class="contact-chevron">▾</span>
+      <span class="chev">▾</span>
     </div>
     <div class="contact-body">
-      ${c.discord?`<div class="cinfo-row"><span class="cinfo-lbl">Discord</span><span class="cinfo-val">${esc(c.discord)}</span></div>`:''}
-      ${c.discordId?`<div class="cinfo-row"><span class="cinfo-lbl">Discord ID</span><span class="cinfo-val">${esc(c.discordId)}</span></div>`:''}
-      ${c.desc?`<div class="cinfo-row"><span class="cinfo-lbl">Note</span><span class="cinfo-val">${esc(c.desc)}</span></div>`:''}
+      ${c.discord    ? `<div class="cinfo-row"><span class="cinfo-lbl">Discord</span><span class="cinfo-val">${esc(c.discord)}</span></div>` : ''}
+      ${c.discordId  ? `<div class="cinfo-row"><span class="cinfo-lbl">Discord ID</span><span class="cinfo-val">${esc(c.discordId)}</span></div>` : ''}
+      ${c.desc       ? `<div class="cinfo-row"><span class="cinfo-lbl">Note</span><span class="cinfo-val">${esc(c.desc)}</span></div>` : ''}
       <div class="cinfo-row"><span class="cinfo-lbl">Wallet</span><span class="cinfo-val">${esc(c.wallet)}</span></div>
       ${sentHtml}
       <div class="c-actions">
-        ${opts.showSend!==false?`<button class="c-btn send-c" data-send="${esc(c.wallet)}">⚡ Send</button>`:''}
+        ${opts.showSend!==false ? `<button class="c-btn send-c" data-send="${c.id}">⚡ Send</button>` : ''}
         <button class="c-btn" data-edit="${c.id}">✎ Edit</button>
         <button class="c-btn del" data-del="${c.id}">✕ Delete</button>
       </div>
     </div>`
-  div.querySelector('.contact-head').addEventListener('click',()=>{
-    div.classList.toggle('open')
-  })
-  div.querySelector('[data-edit]')?.addEventListener('click',e=>{
-    e.stopPropagation()
-    openEditContact(c.id)
-  })
-  div.querySelector('[data-del]')?.addEventListener('click',e=>{
-    e.stopPropagation()
-    confirmDelete(c.id, c.name)
-  })
+  div.querySelector('.contact-head').addEventListener('click',()=>div.classList.toggle('open'))
+  div.querySelector('[data-edit]')?.addEventListener('click',e=>{ e.stopPropagation(); openEditContact(c.id) })
+  div.querySelector('[data-del]')?.addEventListener('click',e=>{ e.stopPropagation(); confirmDelete(c.id,c.name) })
   div.querySelector('[data-send]')?.addEventListener('click',e=>{
     e.stopPropagation()
     navTo('send')
-    setTimeout(()=>preselectContact(c),100)
+    setTimeout(()=>applyContactSel(c),80)
   })
-  listEl.appendChild(div)
+  return div
 }
 
-// ─────────────────────────────────────────────
-//  DASHBOARD CONTACTS
-// ─────────────────────────────────────────────
-function renderDashboard(){
-  renderContactListHome()
-  renderTokenList()
+function populateContactList(el, filter=''){
+  el.innerHTML=''
+  const list = getContacts().filter(c=>!filter||
+    c.name.toLowerCase().includes(filter)||
+    c.wallet.toLowerCase().includes(filter)||
+    (c.discord||'').toLowerCase().includes(filter))
+  if(!list.length){
+    el.innerHTML=`<div class="empty"><div class="empty-ico">◉</div>${filter?'No matches':'No contacts yet'}</div>`
+    return
+  }
+  list.forEach(c=>el.appendChild(buildContactCard(c)))
 }
 
+// ─── HOME CONTACTS ────────────────────────────────────────────────────────────
 function renderContactListHome(filter=''){
-  const el = document.getElementById('contact-list-home')
-  el.innerHTML=''
-  const contacts = getContacts().filter(c=>!filter||
-    c.name.toLowerCase().includes(filter)||c.wallet.toLowerCase().includes(filter)||
-    (c.discord||'').toLowerCase().includes(filter))
-  if(!contacts.length){
-    el.innerHTML=`<div class="empty"><div class="empty-icon">◉</div>${filter?'No matches':'No contacts yet — add one!'}</div>`
-    return
-  }
-  contacts.forEach(c=>renderContactCard(c, el, {showSend:true}))
+  populateContactList(document.getElementById('contact-list-home'), filter)
 }
+function renderTokenListHomeFiltered(f){ renderTokenListHome(f) }
+document.getElementById('contact-search-home').addEventListener('input',e=>renderContactListHome(e.target.value.toLowerCase()))
+document.getElementById('goto-new-contact').addEventListener('click',()=>{ navTo('contacts'); setTimeout(()=>showContactTab('new'),60) })
 
-document.getElementById('contact-search-home').addEventListener('input',e=>{
-  renderContactListHome(e.target.value.toLowerCase())
-})
-document.getElementById('goto-new-contact').addEventListener('click',()=>{
-  navTo('contacts'); setTimeout(()=>showContactTab('new'),50)
-})
-
-// ─────────────────────────────────────────────
-//  CONTACTS PAGE
-// ─────────────────────────────────────────────
+// ─── CONTACTS PAGE ────────────────────────────────────────────────────────────
 function renderContactsPage(filter=''){
-  const el = document.getElementById('contact-list-page')
-  el.innerHTML=''
-  const contacts = getContacts().filter(c=>!filter||
-    c.name.toLowerCase().includes(filter)||c.wallet.toLowerCase().includes(filter)||
-    (c.discord||'').toLowerCase().includes(filter))
-  if(!contacts.length){
-    el.innerHTML=`<div class="empty"><div class="empty-icon">◉</div>${filter?'No matches':'No contacts yet'}</div>`
-    return
-  }
-  contacts.forEach(c=>renderContactCard(c, el, {showSend:true}))
+  populateContactList(document.getElementById('contact-list-page'), filter)
 }
 document.getElementById('contact-search-page').addEventListener('input',e=>renderContactsPage(e.target.value.toLowerCase()))
 
 window.showContactTab = function(tab){
-  const listWrap = document.getElementById('contact-list-wrap')
-  const formWrap = document.getElementById('contact-form-wrap')
+  const lw = document.getElementById('contact-list-wrap')
+  const fw = document.getElementById('contact-form-wrap')
   document.getElementById('tab-list').classList.toggle('active', tab==='list')
   document.getElementById('tab-new').classList.toggle('active',  tab==='new')
   if(tab==='list'){
-    listWrap.classList.remove('hidden')
-    formWrap.classList.remove('visible')
+    lw.classList.remove('cf-hidden'); fw.classList.add('cf-hidden')
     renderContactsPage()
-    // reset form
-    document.getElementById('edit-id').value=''
-    document.getElementById('cf-name').value=''
-    document.getElementById('cf-wallet').value=''
-    document.getElementById('cf-discord').value=''
-    document.getElementById('cf-discord-id').value=''
-    document.getElementById('cf-desc').value=''
-    document.getElementById('form-title').textContent='New Contact'
+    resetContactForm()
   } else {
-    listWrap.classList.add('hidden')
-    formWrap.classList.add('visible')
+    lw.classList.add('cf-hidden'); fw.classList.remove('cf-hidden')
   }
+}
+
+function resetContactForm(){
+  document.getElementById('edit-id').value=''; document.getElementById('cf-name').value=''
+  document.getElementById('cf-wallet').value=''; document.getElementById('cf-discord').value=''
+  document.getElementById('cf-discord-id').value=''; document.getElementById('cf-desc').value=''
+  document.getElementById('form-title').textContent='New Contact'
+  document.getElementById('save-lbl').textContent='Save Contact'
 }
 
 function openEditContact(id){
   const c = getContacts().find(x=>x.id===id)
   if(!c) return
-  navTo('contacts')
-  showContactTab('new')
-  document.getElementById('form-title').textContent = 'Edit Contact'
+  navTo('contacts'); showContactTab('new')
+  document.getElementById('form-title').textContent='Edit Contact'
+  document.getElementById('save-lbl').textContent='Update Contact'
   document.getElementById('edit-id').value   = c.id
   document.getElementById('cf-name').value   = c.name
   document.getElementById('cf-wallet').value = c.wallet
-  document.getElementById('cf-discord').value    = c.discord   || ''
-  document.getElementById('cf-discord-id').value = c.discordId || ''
-  document.getElementById('cf-desc').value   = c.desc || ''
+  document.getElementById('cf-discord').value    = c.discord||''
+  document.getElementById('cf-discord-id').value = c.discordId||''
+  document.getElementById('cf-desc').value   = c.desc||''
 }
 
 window.saveContact = function(){
   const name   = document.getElementById('cf-name').value.trim()
   const wallet = document.getElementById('cf-wallet').value.trim().toLowerCase()
-  if(!name)  return toast('Name is required','error')
-  if(!wallet) return toast('WAX wallet is required','error')
+  if(!name)   return toast('Display name is required','error')
+  if(!wallet) return toast('WAX wallet address is required','error')
   const contacts = getContacts()
-  const editId = document.getElementById('edit-id').value
+  const editId   = document.getElementById('edit-id').value
   if(editId){
     const idx = contacts.findIndex(c=>c.id===editId)
     if(idx>-1){
-      contacts[idx] = {...contacts[idx], name, wallet,
+      contacts[idx]={...contacts[idx], name, wallet,
         discord:document.getElementById('cf-discord').value.trim(),
         discordId:document.getElementById('cf-discord-id').value.trim(),
-        desc:document.getElementById('cf-desc').value.trim()}
-      saveContacts(contacts)
-      toast('Contact updated')
+        desc:document.getElementById('cf-desc').value.trim() }
+      saveContacts(contacts); toast('Contact updated')
     }
   } else {
-    contacts.push({
-      id: Date.now().toString(36)+Math.random().toString(36).slice(2,6),
-      name, wallet,
+    contacts.push({ id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),
+      name,wallet,
       discord:document.getElementById('cf-discord').value.trim(),
       discordId:document.getElementById('cf-discord-id').value.trim(),
       desc:document.getElementById('cf-desc').value.trim(),
-      created: Date.now()
-    })
-    saveContacts(contacts)
-    toast('Contact saved')
+      created:Date.now() })
+    saveContacts(contacts); toast('Contact saved ✓')
   }
   showContactTab('list')
   renderContactListHome()
+  renderContactDp()
 }
+document.getElementById('save-contact-btn').addEventListener('click', window.saveContact)
 
-// Delete with double confirm
-let pendingDeleteId = null
+// ─── DELETE ───────────────────────────────────────────────────────────────────
+let pendingDelId = null
 function confirmDelete(id, name){
-  pendingDeleteId = id
-  document.getElementById('modal-del-msg').textContent =
-    `Delete "${name}"? This cannot be undone.`
+  pendingDelId = id
+  document.getElementById('modal-del-msg').textContent=`Delete "${name}"? This cannot be undone.`
   openModal('modal-delete')
 }
 document.getElementById('modal-del-confirm').addEventListener('click',()=>{
-  if(!pendingDeleteId) return
-  const contacts = getContacts().filter(c=>c.id!==pendingDeleteId)
-  saveContacts(contacts)
-  pendingDeleteId = null
+  if(!pendingDelId) return
+  saveContacts(getContacts().filter(c=>c.id!==pendingDelId))
+  pendingDelId=null
   closeModal('modal-delete')
   toast('Contact deleted')
-  renderContactsPage()
-  renderContactListHome()
+  renderContactsPage(); renderContactListHome(); renderContactDp()
 })
 
-// ─────────────────────────────────────────────
-//  SEND PAGE
-// ─────────────────────────────────────────────
-let selectedContact = null
-let selectedToken   = null
+// ─── DROPDOWN SYSTEM ──────────────────────────────────────────────────────────
+function setupDropdown(triggerId, panelId, searchId){
+  const trigger = document.getElementById(triggerId)
+  const panel   = document.getElementById(panelId)
+  trigger.addEventListener('click', e=>{
+    e.stopPropagation()
+    const isOpen = panel.classList.contains('open')
+    // close all
+    document.querySelectorAll('.dropdown-panel').forEach(d=>d.classList.remove('open'))
+    document.querySelectorAll('.dropdown-trigger').forEach(d=>d.classList.remove('open'))
+    if(!isOpen){
+      panel.classList.add('open')
+      trigger.classList.add('open')
+      const si = document.getElementById(searchId)
+      if(si){ si.value=''; si.focus() }
+    }
+  })
+}
+document.addEventListener('click',()=>{
+  document.querySelectorAll('.dropdown-panel').forEach(d=>d.classList.remove('open'))
+  document.querySelectorAll('.dropdown-trigger').forEach(d=>d.classList.remove('open'))
+})
+document.querySelectorAll('.dropdown-panel').forEach(d=>d.addEventListener('click',e=>e.stopPropagation()))
 
-function renderSendPage(){
-  renderContactPick()
-  renderTokenPick()
+setupDropdown('contact-trigger','contact-dropdown','contact-dp-search')
+setupDropdown('token-trigger','token-dropdown','token-dp-search')
+
+// ─── CONTACT DROPDOWN ─────────────────────────────────────────────────────────
+function renderContactDp(filter=''){
+  const el = document.getElementById('contact-dp-list')
+  el.innerHTML=''
+  const contacts = getContacts().filter(c=>!filter||
+    c.name.toLowerCase().includes(filter)||c.wallet.toLowerCase().includes(filter)||
+    (c.discord||'').toLowerCase().includes(filter))
+
+  // manual address entry if filter looks like an address
+  if(filter && filter.length>=5 && !contacts.find(c=>c.wallet===filter)){
+    const manual = document.createElement('div')
+    manual.className='dp-item'
+    manual.innerHTML=`<div class="dp-avatar" style="background:var(--s2);color:var(--text2);">✎</div>
+      <div class="dp-main"><div class="dp-name">Use: ${esc(filter)}</div><div class="dp-sub">Manual address</div></div>`
+    manual.addEventListener('click',()=>{
+      applyContactSel({wallet:filter, name:filter, _manual:true})
+      document.getElementById('contact-dropdown').classList.remove('open')
+      document.getElementById('contact-trigger').classList.remove('open')
+    })
+    el.appendChild(manual)
+  }
+
+  if(!contacts.length && !filter){
+    el.innerHTML='<div class="dp-empty">No contacts yet</div>'; return
+  }
+  contacts.forEach(c=>{
+    const item = document.createElement('div')
+    item.className='dp-item'+(selContact?.id===c.id?' sel':'')
+    item.innerHTML=`
+      <div class="dp-avatar">${avatarLetter(c)}</div>
+      <div class="dp-main"><div class="dp-name">${esc(c.name)}</div><div class="dp-sub">${esc(c.wallet)}</div></div>
+      ${selContact?.id===c.id?'<span class="dp-check">✓</span>':''}`
+    item.addEventListener('click',()=>{
+      applyContactSel(c)
+      document.getElementById('contact-dropdown').classList.remove('open')
+      document.getElementById('contact-trigger').classList.remove('open')
+    })
+    el.appendChild(item)
+  })
 }
 
-function renderContactPick(filter=''){
-  const el = document.getElementById('contact-pick')
-  const contacts = getContacts()
-  if(!contacts.length){
-    el.innerHTML='<div style="font-size:12px;color:var(--muted);font-family:\'Space Mono\',monospace;padding:4px 0;">No contacts yet</div>'
+document.getElementById('contact-dp-search').addEventListener('input',e=>{
+  renderContactDp(e.target.value.toLowerCase())
+})
+
+function applyContactSel(c){
+  if(c._manual || !c.id){
+    selContact = {wallet:c.wallet, name:c.wallet}
+  } else {
+    selContact = c
+  }
+  document.getElementById('send-to').value = selContact.wallet
+  const trig = document.getElementById('contact-trigger')
+  trig.innerHTML=`<div class="dt-value"><div class="dt-name">${esc(selContact.name)}</div><div class="dt-sub">${esc(selContact.wallet)}</div></div><span class="dt-arrow">▾</span>`
+  renderContactDp()
+}
+
+// ─── TOKEN DROPDOWN ───────────────────────────────────────────────────────────
+function renderTokenDp(filter=''){
+  const el = document.getElementById('token-dp-list')
+  el.innerHTML=''
+  const list = filter
+    ? TOKENS.filter(t=>t.sym.toLowerCase().includes(filter.toLowerCase()))
+    : TOKENS
+  if(!list.length){
+    el.innerHTML=`<div class="dp-empty">${filter?'No matching tokens':'Load tokens first (Home → Refresh)'}</div>`
     return
   }
-  el.innerHTML = contacts.map(c=>`
-    <div class="cpick${selectedContact?.id===c.id?' sel':''}" data-id="${c.id}">
-      <div class="cpick-name">${esc(c.name)}</div>
-      <div class="cpick-wallet">${esc(c.wallet)}</div>
-    </div>`).join('')
-  el.querySelectorAll('.cpick').forEach(el=>{
-    el.addEventListener('click',()=>{
-      const c = getContacts().find(x=>x.id===el.dataset.id)
-      if(!c) return
-      if(selectedContact?.id===c.id){
-        selectedContact=null
-        document.getElementById('send-to').value=''
-      } else {
-        selectedContact=c
-        document.getElementById('send-to').value=c.wallet
-      }
-      renderContactPick()
+  list.forEach(t=>{
+    const item = document.createElement('div')
+    item.className='dp-item'+(selToken?.sym===t.sym?' sel':'')
+    item.innerHTML=`
+      <div class="dp-token-icon">${t.sym.slice(0,3)}</div>
+      <div class="dp-main"><div class="dp-name">${t.sym}</div><div class="dp-sub">${t.contract}</div></div>
+      <div class="dp-bal">${t.balStr}</div>
+      ${selToken?.sym===t.sym?'<span class="dp-check">✓</span>':''}`
+    item.addEventListener('click',()=>{
+      applyTokenSel(t)
+      document.getElementById('token-dropdown').classList.remove('open')
+      document.getElementById('token-trigger').classList.remove('open')
     })
+    el.appendChild(item)
   })
 }
 
-function renderTokenPick(){
-  const el = document.getElementById('token-pick')
-  if(!TOKENS.length){ el.innerHTML='<div style="font-size:11px;color:var(--muted);font-family:\'Space Mono\',monospace;">Load tokens first</div>'; return }
-  el.innerHTML = TOKENS.map(t=>`
-    <div class="tsym${selectedToken?.sym===t.sym?' sel':''}" data-sym="${t.sym}" data-contract="${t.contract}" data-prec="${t.precision}">
-      ${t.sym}
-    </div>`).join('')
-  el.querySelectorAll('.tsym').forEach(btn=>{
-    btn.addEventListener('click',()=>{
-      selectedToken={sym:btn.dataset.sym, contract:btn.dataset.contract, precision:parseInt(btn.dataset.prec)}
-      document.getElementById('send-sym-label').textContent = selectedToken.sym
-      renderTokenPick()
-    })
-  })
+document.getElementById('token-dp-search').addEventListener('input',e=>{
+  renderTokenDp(e.target.value.toLowerCase())
+})
+
+function applyTokenSel(t){
+  selToken = t
+  document.getElementById('send-sym-label').textContent = t.sym
+  document.getElementById('token-trigger').innerHTML=`
+    <div class="dt-value">
+      <div class="dt-name">${t.sym}</div>
+      <div class="dt-sub">${t.balStr} available</div>
+    </div>
+    <span class="dt-arrow">▾</span>`
+  updateAvailLabel()
+  renderTokenDp()
 }
 
-function preselectContact(c){
-  selectedContact = c
-  document.getElementById('send-to').value = c.wallet
-  renderContactPick()
+// ─── AMOUNT VALIDATION ────────────────────────────────────────────────────────
+function updateAvailLabel(){
+  const lbl    = document.getElementById('avail-label')
+  const input  = document.getElementById('send-amount')
+  if(!selToken){ lbl.style.display='none'; return }
+  const amount = parseFloat(input.value)||0
+  const avail  = selToken.balance
+  if(amount>0 && amount>avail){
+    lbl.textContent = `⚠ Insufficient balance — you have ${selToken.balStr}`
+    lbl.className   = 'avail-label warn'
+    input.classList.add('over')
+  } else {
+    lbl.textContent = `Available: ${selToken.balStr}`
+    lbl.className   = 'avail-label ok'
+    input.classList.remove('over')
+  }
+  lbl.style.display='block'
 }
+document.getElementById('send-amount').addEventListener('input', updateAvailLabel)
 
+document.getElementById('max-btn').addEventListener('click',()=>{
+  if(!selToken) return toast('Select a token first','error')
+  document.getElementById('send-amount').value = selToken.balance.toFixed(selToken.precision)
+  updateAvailLabel()
+})
+
+// ─── SEND ─────────────────────────────────────────────────────────────────────
 document.getElementById('do-send').addEventListener('click', async()=>{
-  if(!SESSION) return toast('Not connected','error')
-  const to     = document.getElementById('send-to').value.trim()
-  const amount = parseFloat(document.getElementById('send-amount').value)
-  const memo   = document.getElementById('send-memo').value.trim()
-  if(!to)            return toast('Enter recipient address','error')
-  if(!selectedToken) return toast('Select a token','error')
-  if(!amount || amount<=0) return toast('Enter a valid amount','error')
+  if(!SESSION)    return toast('Not connected','error')
+  const to      = document.getElementById('send-to').value.trim()
+  const amount  = parseFloat(document.getElementById('send-amount').value)
+  const memo    = document.getElementById('send-memo').value.trim()
+  if(!to)             return toast('Select a recipient','error')
+  if(!selToken)       return toast('Select a token','error')
+  if(!amount||amount<=0) return toast('Enter a valid amount','error')
+  if(amount > selToken.balance) return toast(`Insufficient balance (have ${selToken.balStr})`,'error')
 
-  const quantity = `${amount.toFixed(selectedToken.precision)} ${selectedToken.sym}`
+  const quantity = `${amount.toFixed(selToken.precision)} ${selToken.sym}`
   const btn = document.getElementById('do-send')
   btn.classList.add('loading'); btn.disabled=true
   document.getElementById('tx-result').style.display='none'
-
   try{
-    const action = {
-      account: selectedToken.contract,
-      name:'transfer',
-      authorization:[SESSION.permissionLevel],
-      data:{ from:SESSION.actor, to, quantity, memo }
-    }
-    const result = await SESSION.transact({action})
-    const txId = result.response?.transaction_id
-      || result.resolved?.transaction?.id
-      || '(pending)'
-
-    recordSent(to, amount, selectedToken.sym)
-
+    const result = await SESSION.transact({
+      action:{
+        account:selToken.contract, name:'transfer',
+        authorization:[SESSION.permissionLevel],
+        data:{ from:SESSION.actor, to, quantity, memo }
+      }
+    })
+    const txId = result.response?.transaction_id||result.resolved?.transaction?.id||'(pending)'
+    recordSent(to, amount, selToken.sym)
     const txEl = document.getElementById('tx-result')
-    txEl.innerHTML = `✓ Sent ${quantity} to ${esc(to)}<br>
-      <span style="opacity:.6">TX:</span> <a href="https://waxblock.io/transaction/${txId}" target="_blank">${txId}</a>`
+    txEl.innerHTML = `✓ Sent <strong>${quantity}</strong> → ${esc(to)}<br>
+      <span style="opacity:.6">TX: </span><a href="https://waxblock.io/transaction/${txId}" target="_blank" rel="noopener">${txId}</a>`
     txEl.style.display='block'
-    toast(`Sent ${quantity} to ${to}`)
-
-    // Clear form
-    document.getElementById('send-to').value=''
+    toast(`Sent ${quantity}`)
+    // reset form
     document.getElementById('send-amount').value=''
     document.getElementById('send-memo').value=''
-    selectedContact=null
-    renderContactPick()
-    renderContactListHome()  // refresh sent totals
+    document.getElementById('send-to').value=''
+    selContact=null
+    document.getElementById('contact-trigger').innerHTML=`<span class="dt-placeholder" id="contact-trigger-text">Enter address or pick contact…</span><span class="dt-arrow">▾</span>`
+    renderContactDp()
+    updateAvailLabel()
+    // reload balance
+    loadTokens()
   }catch(e){
     toast(e.message||'Transaction failed','error')
   }finally{
@@ -988,39 +1180,23 @@ document.getElementById('do-send').addEventListener('click', async()=>{
   }
 })
 
-// ─────────────────────────────────────────────
-//  SETTINGS
-// ─────────────────────────────────────────────
+// ─── SETTINGS ─────────────────────────────────────────────────────────────────
 document.getElementById('clear-data-btn').addEventListener('click',()=>openModal('modal-clear'))
-document.getElementById('modal-clear-confirm1').addEventListener('click',()=>{
-  closeModal('modal-clear')
-  setTimeout(()=>openModal('modal-clear2'),200)
-})
-document.getElementById('modal-clear-confirm2').addEventListener('click',()=>{
+document.getElementById('modal-clear-c1').addEventListener('click',()=>{ closeModal('modal-clear'); setTimeout(()=>openModal('modal-clear2'),220) })
+document.getElementById('modal-clear-c2').addEventListener('click',()=>{
   localStorage.removeItem('waxsend_contacts')
   localStorage.removeItem('waxsend_history')
   closeModal('modal-clear2')
-  toast('All local data cleared')
-  renderContactListHome()
-  renderContactsPage()
+  toast('All local data wiped')
+  renderContactListHome(); renderContactsPage(); renderContactDp()
 })
 
-// ─────────────────────────────────────────────
-//  MODAL HELPERS
-// ─────────────────────────────────────────────
-window.openModal  = id=>document.getElementById(id).classList.add('open')
-window.closeModal = id=>document.getElementById(id).classList.remove('open')
+// ─── MODALS ───────────────────────────────────────────────────────────────────
+window.openModal  = id => document.getElementById(id).classList.add('open')
+window.closeModal = id => document.getElementById(id).classList.remove('open')
 document.querySelectorAll('.overlay').forEach(ov=>{
   ov.addEventListener('click',e=>{ if(e.target===ov) ov.classList.remove('open') })
 })
-
-// ─────────────────────────────────────────────
-//  UTIL
-// ─────────────────────────────────────────────
-function esc(s){ return String(s||'').replace(/[<>&"']/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c])) }
-
-// expose for HTML onclick
-window.saveContact = window.saveContact || (()=>{})
 </script>
 </body>
 </html>
