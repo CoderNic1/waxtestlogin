@@ -158,7 +158,6 @@ body::before{content:'';position:fixed;inset:0;
 .token-sym{font-size:13px;font-weight:700;}
 .token-contract{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);}
 .token-balance{font-family:'Space Mono',monospace;font-size:12px;color:var(--text);text-align:right;flex-shrink:0;}
-.token-loading{text-align:center;padding:28px 16px;color:var(--muted);font-size:12px;font-family:'Space Mono',monospace;}
 
 /* ── BUTTONS ── */
 .btn-primary{display:flex;align-items:center;justify-content:center;gap:8px;padding:13px 18px;
@@ -300,6 +299,54 @@ body::before{content:'';position:fixed;inset:0;
 
 /* ── FIELD DROPDOWN container ── */
 .field-dropdown{position:relative;}
+
+/* ── TOKEN LOADING ── */
+.token-loading{text-align:center;padding:20px;color:var(--muted);font-size:12px;font-family:'Space Mono',monospace;display:flex;flex-direction:column;align-items:center;gap:8px;}
+.token-loading-bar{width:80%;height:3px;background:var(--border);border-radius:3px;overflow:hidden;}
+.token-loading-bar::after{content:'';display:block;height:100%;width:40%;background:linear-gradient(90deg,var(--accent),var(--a2));border-radius:3px;animation:loadslide 1.2s ease-in-out infinite;}
+@keyframes loadslide{0%{transform:translateX(-100%);}100%{transform:translateX(300%)}}
+
+/* ── STATS PAGE ── */
+#page-stats .stats-wrap{max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:14px;}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;}
+.stat-card-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.stat-card-title{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);}
+
+/* Summary row */
+.stat-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+@media(max-width:480px){.stat-summary{grid-template-columns:repeat(2,1fr);}}
+.stat-box{background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;}
+.stat-box-val{font-family:'Space Mono',monospace;font-size:18px;font-weight:700;color:var(--accent);line-height:1.2;margin-bottom:4px;}
+.stat-box-lbl{font-size:10px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;}
+
+/* History list */
+.tx-hist-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
+.tx-hist-item:last-child{border-bottom:none;}
+.tx-arrow-icon{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,rgba(247,183,49,.15),rgba(255,107,53,.1));
+  display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.tx-info{flex:1;min-width:0;}
+.tx-to{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.tx-memo{font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'Space Mono',monospace;}
+.tx-right{text-align:right;flex-shrink:0;}
+.tx-amount{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:var(--accent);}
+.tx-time{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);}
+
+/* Per-contact stats */
+.contact-stat-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
+.contact-stat-row:last-child{border-bottom:none;}
+.cs-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--a2));
+  display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:#000;flex-shrink:0;}
+.cs-name{font-size:13px;font-weight:700;}
+.cs-wallet{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);}
+.cs-tokens{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px;}
+.cs-token-tag{font-family:'Space Mono',monospace;font-size:10px;padding:2px 8px;
+  background:rgba(0,229,255,.07);border:1px solid rgba(0,229,255,.15);border-radius:100px;color:var(--a3);}
+
+/* Token filter tabs */
+.token-filter{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;}
+.tf-btn{padding:5px 12px;background:var(--s2);border:1px solid var(--border);border-radius:100px;
+  cursor:pointer;font-family:'Space Mono',monospace;font-size:10px;color:var(--text2);transition:all .2s;}
+.tf-btn.active,.tf-btn:hover{background:rgba(247,183,49,.1);border-color:var(--accent);color:var(--accent);}
 </style>
 </head>
 <body>
@@ -504,6 +551,34 @@ body::before{content:'';position:fixed;inset:0;
       </div>
     </div>
 
+    <!-- ── STATS ── -->
+    <div class="page" id="page-stats">
+      <div class="stats-wrap">
+        <!-- Summary cards -->
+        <div class="stat-card">
+          <div class="stat-card-hd"><span class="stat-card-title">Overview</span></div>
+          <div class="stat-summary" id="stats-summary"></div>
+        </div>
+
+        <!-- Recent transactions -->
+        <div class="stat-card">
+          <div class="stat-card-hd">
+            <span class="stat-card-title">Last 10 Transactions</span>
+          </div>
+          <div id="tx-hist-list"></div>
+        </div>
+
+        <!-- Per-contact breakdown -->
+        <div class="stat-card">
+          <div class="stat-card-hd">
+            <span class="stat-card-title">Sent By Contact</span>
+            <div class="token-filter" id="token-filter" style="margin-bottom:0;"></div>
+          </div>
+          <div id="contact-stats-list"></div>
+        </div>
+      </div>
+    </div>
+
   </div><!-- /pages -->
 
   <!-- BOTTOM NAV -->
@@ -519,6 +594,10 @@ body::before{content:'';position:fixed;inset:0;
     <button id="nav-contacts" onclick="navTo('contacts')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       Contacts
+    </button>
+    <button id="nav-stats" onclick="navTo('stats')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      Stats
     </button>
     <button id="nav-settings" onclick="navTo('settings')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
@@ -604,11 +683,18 @@ const lsSet = (k,v) => localStorage.setItem(k, JSON.stringify(v))
 const getContacts   = ()  => lsGet('waxsend_contacts') || []
 const saveContacts  = arr => lsSet('waxsend_contacts', arr)
 const getHistory    = ()  => lsGet('waxsend_history')  || {}
-function recordSent(wallet, amount, sym){
+const getTxHistory  = ()  => lsGet('waxsend_txhistory') || []
+function recordSent(wallet, amount, sym, memo, txId){
+  // Aggregate totals per wallet/token
   const h = getHistory(), key = wallet.toLowerCase()
   if(!h[key]) h[key] = {}
   h[key][sym] = (h[key][sym]||0) + (parseFloat(amount)||0)
   lsSet('waxsend_history', h)
+  // Full tx log (last 50)
+  const txlog = getTxHistory()
+  txlog.unshift({ wallet, amount:parseFloat(amount), sym, memo:memo||'', txId:txId||'', ts:Date.now() })
+  if(txlog.length > 50) txlog.length = 50
+  lsSet('waxsend_txhistory', txlog)
 }
 const getSentTo = w => (getHistory()[w.toLowerCase()] || {})
 
@@ -697,6 +783,7 @@ window.navTo = function(p){
   if(p==='home')     { renderContactListHome(); renderTokenListHome() }
   if(p==='send')     { renderContactDp(); renderTokenDp() }
   if(p==='contacts') renderContactsPage()
+  if(p==='stats')    renderStatsPage()
 }
 
 // ─── AUTH ─────────────────────────────────────────────────────────────────────
@@ -754,70 +841,83 @@ document.getElementById('disconnect-btn').addEventListener('click', logout)
 })()
 
 // ─── LOAD TOKENS via Hyperion get_tokens ──────────────────────────────────────
-// This endpoint returns EVERY token the account holds — no hardcoded list needed.
-// It's provided by Hyperion full-history nodes on WAX.
+// Strategy:
+//  1. Always fetch WAX (eosio.token) directly — it's the most important and
+//     sometimes omitted or delayed by Hyperion indexers.
+//  2. Try Hyperion /v2/state/get_tokens?account=X&limit=1000 on multiple nodes.
+//     The limit=1000 param is CRITICAL — default cap is often 10-15 tokens!
+//  3. Merge results, deduplicate, WAX always on top.
 async function loadTokens(){
   if(!SESSION) return
   const actor = String(SESSION.actor)
   const listEl = document.getElementById('token-list')
-  listEl.innerHTML = '<div class="token-loading">⟳ Discovering all tokens…</div>'
+  listEl.innerHTML = `<div class="token-loading"><span>⟳ Discovering all tokens…</span><div class="token-loading-bar"></div></div>`
 
-  let raw = null
+  const byKey = {}  // sym|contract -> token object
 
-  // Try each Hyperion node until one responds with valid token data
+  // ── Step 1: Always fetch WAX directly (guaranteed) ──
+  try{
+    const r = await fetch(`${WAX_RPC}/v1/chain/get_currency_balance`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ code:'eosio.token', account:actor, symbol:'WAX' }),
+      signal: AbortSignal.timeout(8000)
+    })
+    const arr = await r.json()
+    if(Array.isArray(arr) && arr.length){
+      const balStr  = arr[0]
+      const balance = parseFloat(balStr.split(' ')[0])
+      if(balance >= 0){
+        byKey['WAX|eosio.token'] = { sym:'WAX', contract:'eosio.token', precision:8, balance, balStr }
+      }
+    }
+  }catch(e){ console.warn('[WAX direct fetch failed]', e) }
+
+  // ── Step 2: Try Hyperion nodes for full token list ──
+  // IMPORTANT: ?limit=1000 is required — default is ~10 on most nodes!
+  let hyperionOk = false
   for(const node of HYPERION_NODES){
     try{
-      const r = await fetch(`${node}/v2/state/get_tokens?account=${actor}`, {
-        signal: AbortSignal.timeout(7000)
-      })
-      if(!r.ok) continue
+      const url = `${node}/v2/state/get_tokens?account=${encodeURIComponent(actor)}&limit=1000`
+      const r = await fetch(url, { signal: AbortSignal.timeout(10000) })
+      if(!r.ok){ console.warn(`[${node}] HTTP ${r.status}`); continue }
       const data = await r.json()
-      if(data && Array.isArray(data.tokens) && data.tokens.length > 0){
-        raw = data.tokens
-        break
+
+      if(!data || !Array.isArray(data.tokens)){
+        console.warn(`[${node}] unexpected response format`, data); continue
       }
-    }catch{ /* try next node */ }
-  }
 
-  let results = []
+      console.log(`[Hyperion ${node}] returned ${data.tokens.length} tokens`)
 
-  if(raw){
-    // Hyperion returns: { symbol, precision, amount, contract }
-    results = raw
-      .filter(t => (t.amount||0) > 0)
-      .map(t => {
-        const precision = t.precision ?? 8
-        const balance   = parseFloat(t.amount) || 0
-        const balStr    = `${balance.toFixed(precision)} ${t.symbol}`
-        return { sym:t.symbol, contract:t.contract, precision, balance, balStr }
-      })
-  } else {
-    // All Hyperion nodes failed — fall back to fetching WAX balance directly
-    listEl.innerHTML = '<div class="token-loading">⟳ Hyperion unavailable, fetching WAX…</div>'
-    for(const t of FALLBACK_TOKENS){
-      try{
-        const r   = await fetch(`${WAX_RPC}/v1/chain/get_currency_balance`,{
-          method:'POST', headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({ code:t.contract, account:actor, symbol:t.sym })
-        })
-        const arr = await r.json()
-        if(Array.isArray(arr) && arr.length){
-          const balStr = arr[0]
-          const balance = parseFloat(balStr.split(' ')[0])
-          if(balance > 0) results.push({...t, balance, balStr})
-        }
-      }catch{}
+      for(const t of data.tokens){
+        if(!t.symbol || !t.contract) continue
+        const bal = parseFloat(t.amount) || 0
+        if(bal <= 0) continue
+        const key = `${t.symbol}|${t.contract}`
+        const precision = typeof t.precision === 'number' ? t.precision : 8
+        const balStr = `${bal.toFixed(precision)} ${t.symbol}`
+        byKey[key] = { sym:t.symbol, contract:t.contract, precision, balance:bal, balStr }
+      }
+      hyperionOk = true
+      break  // success, stop trying other nodes
+    }catch(e){
+      console.warn(`[${node}] failed:`, e.message||e)
     }
   }
 
-  // Sort: WAX always first, then by balance descending
+  if(!hyperionOk){
+    console.warn('[loadTokens] All Hyperion nodes failed — only direct fetches available')
+  }
+
+  // ── Step 3: Build sorted array — WAX pinned first ──
+  const results = Object.values(byKey)
   results.sort((a,b)=>{
-    if(a.sym === 'WAX') return -1
-    if(b.sym === 'WAX') return  1
+    if(a.sym==='WAX' && a.contract==='eosio.token') return -1
+    if(b.sym==='WAX' && b.contract==='eosio.token') return  1
     return b.balance - a.balance
   })
 
   TOKENS = results
+  console.log(`[loadTokens] Total tokens found: ${TOKENS.length}`)
   renderTokenListHome()
   renderTokenDp()
   updateAvailLabel()
@@ -1178,7 +1278,7 @@ document.getElementById('do-send').addEventListener('click', async()=>{
       }
     })
     const txId = result.response?.transaction_id||result.resolved?.transaction?.id||'(pending)'
-    recordSent(to, amount, selToken.sym)
+    recordSent(to, amount, selToken.sym, memo, txId)
     const txEl = document.getElementById('tx-result')
     txEl.innerHTML = `✓ Sent <strong>${quantity}</strong> → ${esc(to)}<br>
       <span style="opacity:.6">TX: </span><a href="https://waxblock.io/transaction/${txId}" target="_blank" rel="noopener">${txId}</a>`
@@ -1207,10 +1307,146 @@ document.getElementById('modal-clear-c1').addEventListener('click',()=>{ closeMo
 document.getElementById('modal-clear-c2').addEventListener('click',()=>{
   localStorage.removeItem('waxsend_contacts')
   localStorage.removeItem('waxsend_history')
+  localStorage.removeItem('waxsend_txhistory')
   closeModal('modal-clear2')
   toast('All local data wiped')
   renderContactListHome(); renderContactsPage(); renderContactDp()
 })
+
+// ─── STATS PAGE ───────────────────────────────────────────────────────────────
+let statsTokenFilter = 'ALL'
+
+function renderStatsPage(){
+  renderStatsSummary()
+  renderTxHistory()
+  renderTokenFilter()
+  renderContactStats()
+}
+
+function renderStatsSummary(){
+  const txlog    = getTxHistory()
+  const history  = getHistory()
+  const contacts = getContacts()
+
+  // Total txs, unique recipients, total WAX sent
+  const totalTx   = txlog.length
+  const recipients = new Set(txlog.map(t=>t.wallet.toLowerCase())).size
+  const waxSent   = txlog.filter(t=>t.sym==='WAX').reduce((s,t)=>s+t.amount,0)
+
+  document.getElementById('stats-summary').innerHTML = `
+    <div class="stat-box">
+      <div class="stat-box-val">${totalTx}</div>
+      <div class="stat-box-lbl">Transactions</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-box-val">${recipients}</div>
+      <div class="stat-box-lbl">Recipients</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-box-val">${waxSent > 0 ? waxSent.toFixed(2) : '—'}</div>
+      <div class="stat-box-lbl">WAX Sent</div>
+    </div>`
+}
+
+function renderTxHistory(){
+  const txlog = getTxHistory().slice(0, 10)
+  const el    = document.getElementById('tx-hist-list')
+  if(!txlog.length){
+    el.innerHTML = '<div class="empty"><div class="empty-ico">↗</div>No transactions yet</div>'
+    return
+  }
+  const contacts = getContacts()
+  el.innerHTML = txlog.map(tx=>{
+    const c       = contacts.find(c=>c.wallet.toLowerCase()===tx.wallet.toLowerCase())
+    const display = c ? esc(c.name) : esc(tx.wallet)
+    const ago     = timeAgo(tx.ts)
+    const txLink  = tx.txId && tx.txId !== '(pending)'
+      ? `<a href="https://waxblock.io/transaction/${tx.txId}" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none;font-size:10px;">↗ explorer</a>`
+      : ''
+    return `<div class="tx-hist-item">
+      <div class="tx-arrow-icon">↗</div>
+      <div class="tx-info">
+        <div class="tx-to">${display}</div>
+        <div class="tx-memo">${tx.memo || tx.wallet}</div>
+      </div>
+      <div class="tx-right">
+        <div class="tx-amount">${tx.amount.toFixed(4)} ${esc(tx.sym)}</div>
+        <div class="tx-time">${ago} ${txLink}</div>
+      </div>
+    </div>`
+  }).join('')
+}
+
+function renderTokenFilter(){
+  const txlog = getTxHistory()
+  const syms  = ['ALL', ...new Set(txlog.map(t=>t.sym))]
+  const el    = document.getElementById('token-filter')
+  el.innerHTML = syms.map(s=>`
+    <button class="tf-btn${statsTokenFilter===s?' active':''}" data-sym="${esc(s)}">${s}</button>`).join('')
+  el.querySelectorAll('.tf-btn').forEach(b=>{
+    b.addEventListener('click',()=>{
+      statsTokenFilter = b.dataset.sym
+      renderTokenFilter()
+      renderContactStats()
+    })
+  })
+}
+
+function renderContactStats(){
+  const history  = getHistory()
+  const contacts = getContacts()
+  const el       = document.getElementById('contact-stats-list')
+
+  // Build rows for all wallets that have sent history
+  const rows = []
+  for(const [wallet, tokens] of Object.entries(history)){
+    // Filter by selected token
+    const filtered = statsTokenFilter === 'ALL'
+      ? tokens
+      : Object.fromEntries(Object.entries(tokens).filter(([s])=>s===statsTokenFilter))
+    if(!Object.keys(filtered).length) continue
+    const c = contacts.find(c=>c.wallet.toLowerCase()===wallet)
+    rows.push({ wallet, tokens:filtered, contact:c||null })
+  }
+
+  // Sort by total WAX sent desc (or first token value)
+  rows.sort((a,b)=>{
+    const aTotal = Object.values(a.tokens).reduce((s,v)=>s+v, 0)
+    const bTotal = Object.values(b.tokens).reduce((s,v)=>s+v, 0)
+    return bTotal - aTotal
+  })
+
+  if(!rows.length){
+    el.innerHTML = '<div class="empty"><div class="empty-ico">◉</div>No send history yet</div>'
+    return
+  }
+
+  el.innerHTML = rows.map(row=>{
+    const name = row.contact ? esc(row.contact.name) : esc(row.wallet)
+    const letter = (row.contact?.name || row.wallet || '?')[0].toUpperCase()
+    const tokenTags = Object.entries(row.tokens).map(([sym,amt])=>
+      `<span class="cs-token-tag">${amt.toFixed(4)} ${esc(sym)}</span>`).join('')
+    return `<div class="contact-stat-row">
+      <div class="cs-avatar">${letter}</div>
+      <div style="flex:1;min-width:0;">
+        <div class="cs-name">${name}</div>
+        <div class="cs-wallet">${esc(row.wallet)}</div>
+        <div class="cs-tokens">${tokenTags}</div>
+      </div>
+    </div>`
+  }).join('')
+}
+
+function timeAgo(ts){
+  const diff = Date.now() - ts
+  const m = Math.floor(diff/60000)
+  const h = Math.floor(diff/3600000)
+  const d = Math.floor(diff/86400000)
+  if(m < 1)  return 'just now'
+  if(m < 60) return `${m}m ago`
+  if(h < 24) return `${h}h ago`
+  return `${d}d ago`
+}
 
 // ─── MODALS ───────────────────────────────────────────────────────────────────
 window.openModal  = id => document.getElementById(id).classList.add('open')
